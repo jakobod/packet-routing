@@ -24,7 +24,6 @@ FetchContent_Declare(
   GIT_TAG        master
 )
 FetchContent_Populate(actor_framework)
-# CAF >= 0.18 setup
 foreach(varname CAF_ENABLE_EXAMPLES CAF_ENABLE_IO_MODULE CAF_ENABLE_TESTING
                 CAF_ENABLE_TOOLS CAF_ENABLE_OPENSSL_MODULE)
   set(${varname} OFF CACHE INTERNAL "")
@@ -34,15 +33,20 @@ add_subdirectory(${actor_framework_SOURCE_DIR} ${actor_framework_BINARY_DIR})
 
 # -- project files -------------------------------------------------------------
 
+# New source files have to be added here
 set(SRC_FILES)
 
 # -- add executables -----------------------------------------------------------
 
-add_executable(packet-routing
-               "src/main.cpp")
+macro(add_target name)
+  add_executable(${name}
+                 "src/${name}.cpp"
+                 "${SRC_FILES}")
+  target_include_directories(${name} PRIVATE
+                             "header")
+  target_link_libraries(${name} PRIVATE 
+                        CAF::core)
+endmacro()
 
-target_include_directories(packet-routing PRIVATE
-                           "header")
-
-target_link_libraries(packet-routing PRIVATE 
-                      CAF::core)
+add_target(example) # This is the example project
+add_target(main) # This is the main project file
