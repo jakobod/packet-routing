@@ -12,8 +12,11 @@
 namespace actor {
 
 struct transition_state {
+  caf::actor node_one;
+  caf::actor node_two;
   // Nop
 };
 
-caf::behavior transition_actor(caf::stateful_actor<transition_state>* self);
+caf::behavior transition_actor(caf::stateful_actor<transition_state>* self,
+                               caf::actor node_one, caf::actor node_two);
 } // namespace actor

@@ -13,6 +13,7 @@ namespace actor {
 
 struct node_state {
   // Nop
+  std::vector<caf::actor> outgoing_transitions;
 };
 
 caf::behavior node_actor(caf::stateful_actor<node_state>* self);
