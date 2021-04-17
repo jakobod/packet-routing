@@ -16,6 +16,10 @@ if (CAF_ENABLE_ADDRESS_SANITIZER AND NOT WIN32)
   list(APPEND CAF_EXTRA_LDFLAGS "-fsanitize=address")
 endif ()
 
+# -- add external libraries ----------------------------------------------------
+
+find_package(Boost 1.71 COMPONENTS graph REQUIRED)
+
 # -- fetch actor-framework repo ------------------------------------------------
 
 FetchContent_Declare(
@@ -34,9 +38,17 @@ add_subdirectory(${actor_framework_SOURCE_DIR} ${actor_framework_BINARY_DIR})
 # -- project files -------------------------------------------------------------
 
 # New source files have to be added here
-set(SRC_FILES)
+set(SRC_FILES
+  src/actor/node.cpp
+  src/actor/transition.cpp
+  src/actor/message_generator.cpp
+  src/actor/topology_manager.cpp
+  src/graph_generator.cpp
+)
 
 # -- add executables -----------------------------------------------------------
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 macro(add_target name)
   add_executable(${name}
@@ -45,7 +57,7 @@ macro(add_target name)
   target_include_directories(${name} PRIVATE
                              "header")
   target_link_libraries(${name} PRIVATE 
-                        CAF::core)
+                        CAF::core Boost::graph)
 endmacro()
 
 add_target(example) # This is the example project

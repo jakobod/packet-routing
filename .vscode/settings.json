@@ -1,0 +1,11 @@
+{
+    "launch": {
+
+
+        "configurations": [],
+        "compounds": []
+    },
+     "editor.formatOnSave": true,
+    "C_Cpp.default.compileCommands": "/home/henri/.local/src/vas/build/compile_commands.json",
+    "editor.fontSize": 18
+}

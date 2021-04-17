@@ -18,4 +18,6 @@ CAF_BEGIN_TYPE_ID_BLOCK(packet_routing, caf::first_custom_type_id)
   CAF_ADD_ATOM(packet_routing, tell_func_atom)
   CAF_ADD_ATOM(packet_routing, hello_world_atom)
 
+  CAF_ADD_ATOM(packet_routing, generate_atom)
+
 CAF_END_TYPE_ID_BLOCK(packet_routing)

@@ -24,6 +24,7 @@ struct state {
     aout(self) << "Function: I've been called " << num_calls << " times!"
                << std::endl;
   }
+
 };
 
 behavior teller_actor(stateful_actor<state>* self) {
@@ -39,6 +40,7 @@ behavior teller_actor(stateful_actor<state>* self) {
       // Calls the function from the state.
       self->state.tell(self);
     },
+    
   };
 }
 
