@@ -17,6 +17,7 @@ struct transition_state {
 };
 
 caf::behavior transition_actor(caf::stateful_actor<transition_state>* self,
-                               caf::actor node_one, caf::actor node_two);
+                               caf::actor node_one, caf::actor node_two,
+                               caf::actor parent);
 
 } // namespace actors

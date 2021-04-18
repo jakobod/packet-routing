@@ -4,19 +4,25 @@
 #include "type_ids.hpp"
 
 using namespace caf;
+using namespace std::chrono;
 
 namespace actors {
 
-caf::behavior transition_actor(caf::stateful_actor<transition_state>* self,
-                               caf::actor node_one, caf::actor node_two) {
-  self->send(node_one, register_transition_atom_v, self);
-  self->send(node_two, register_transition_atom_v, self);
-
+behavior transition_actor(stateful_actor<transition_state>* self,
+                          actor node_one, actor node_two, actor parent) {
+  aout(self) << "[transition]: Notifying the other actors" << std::endl;
+  self->request(node_one, seconds(1), register_transition_atom_v, self)
+    .then([=](done_atom d) { self->send(parent, d); });
+  self->request(node_two, seconds(1), register_transition_atom_v, self)
+    .then([=](done_atom d) { self->send(parent, d); });
   return {
     [=](message_atom, const std::string& payload) {
+      aout(self) << "[transition]: Got new message" << std::endl;
       if (self->current_sender() == node_one) {
-        self->send(node_two, std::move(payload));
+        aout(self) << "[transition]: Sending to node2" << std::endl;
+        self->send(node_two, message_atom_v, std::move(payload));
       } else {
+        aout(self) << "[transition]: Sending to node1" << std::endl;
         self->send(node_one, std::move(payload));
       }
     },
