@@ -49,11 +49,11 @@ FetchContent_MakeAvailable(googletest)
 
 # New source files have to be added here
 set(SRC_FILES
-  src/actor/node.cpp
-  src/actor/transition.cpp
-  src/actor/message_generator.cpp
-  src/actor/topology_manager.cpp
-  src/graph_generator.cpp
+  src/actors/node.cpp
+  src/actors/transition.cpp
+  src/actors/message_generator.cpp
+  src/actors/topology_manager.cpp
+  src/graph/generator.cpp
 )
 
 # -- add executables -----------------------------------------------------------
@@ -79,7 +79,7 @@ enable_testing()
 
 add_executable(
   vas_test
-  src/graph_generator_test.cpp
+  test/generator.cpp
 )
 target_link_libraries(
   vas_test

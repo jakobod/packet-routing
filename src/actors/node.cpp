@@ -1,8 +1,9 @@
-#include "actor/node.hpp"
+#include "actors/node.hpp"
+
 #include "caf/all.hpp"
 #include "type_ids.hpp"
 
-namespace actor {
+namespace actors {
 
 caf::behavior node_actor(caf::stateful_actor<node_state>* self) {
   return {[=](register_transition_atom, caf::actor outgoing_transition) {
@@ -20,4 +21,4 @@ caf::behavior node_actor(caf::stateful_actor<node_state>* self) {
           }};
 }
 
-} // namespace actor
+} // namespace actors

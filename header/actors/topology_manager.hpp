@@ -9,12 +9,13 @@
 #include "caf/behavior.hpp"
 #include "caf/stateful_actor.hpp"
 
-namespace actor {
+namespace actors {
 
-struct node_state {
+struct topology_manager_state {
   // Nop
-  std::vector<caf::actor> outgoing_transitions;
 };
 
-caf::behavior node_actor(caf::stateful_actor<node_state>* self);
-} // namespace actor
+caf::behavior
+topology_manager_actor(caf::stateful_actor<topology_manager_state>* self);
+
+} // namespace actors

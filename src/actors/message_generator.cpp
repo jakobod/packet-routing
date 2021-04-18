@@ -1,6 +1,6 @@
-#include "actor/message_generator.hpp"
+#include "actors/message_generator.hpp"
 
-namespace actor {
+namespace actors {
 
 caf::behavior
 message_generator_actor(caf::stateful_actor<message_generator_state>* self) {
@@ -8,4 +8,4 @@ message_generator_actor(caf::stateful_actor<message_generator_state>* self) {
   return {};
 }
 
-} // namespace actor
+} // namespace actors
