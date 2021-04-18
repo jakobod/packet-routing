@@ -1,4 +1,5 @@
 #include "graph/generator.hpp"
+#include <random>
 
 using namespace boost;
 
@@ -6,12 +7,13 @@ namespace graph {
 
 Graph generate_random_graph(size_t num_verticies, size_t num_edges, int seed) {
   size_t i = 0, j = 0, count = 0;
+  std::mt19937 gen(seed); //Standard mersenne_twister_engine seeded with rd()
+  std::uniform_int_distribution<> distrib(0, num_verticies);
+
   Edge edges[num_edges];
 
-  srand(seed);
-
   while (i < num_edges) {
-    edges[i] = Edge(rand() % num_verticies + 1, rand() % num_verticies + 1);
+    edges[i] = Edge(distrib(gen), distrib(gen));
 
     if (edges[i].first == edges[i].second)
       continue;
