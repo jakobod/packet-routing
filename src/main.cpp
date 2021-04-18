@@ -18,9 +18,9 @@ using namespace caf;
 
 namespace {
 
-struct config : caf::actor_system_config {
+struct config : actor_system_config {
   config() {
-    caf::init_global_meta_objects<caf::id_block::packet_routing>();
+    init_global_meta_objects<id_block::packet_routing>();
     opt_group{custom_options_, "global"}
       .add(num_nodes, "num-nodes,n", "number of nodes")
       .add(num_transitions, "num-transitions,t", "number of transitions")
@@ -33,7 +33,7 @@ struct config : caf::actor_system_config {
   std::string actor_name = "";
 };
 
-void caf_main(caf::actor_system& sys, const config& args) {
+void caf_main(actor_system& sys, const config& args) {
   scoped_actor self{sys};
   // auto tm = sys.spawn(actors::topology_manager_actor);
   // self->send(tm, generate_atom_v, args.num_nodes, args.num_transitions,
@@ -46,6 +46,11 @@ void caf_main(caf::actor_system& sys, const config& args) {
     self->receive([&](done_atom) { aout(self) << "initialized" << std::endl; });
 
   self->send(node1, emit_message_atom_v, "Initiale Nachricht");
+
+  std::string dummy;
+  std::getline(std::cin, dummy);
+  self->send_exit(transition, exit_reason::user_shutdown);
+  std::getline(std::cin, dummy);
 }
 
 } // namespace
