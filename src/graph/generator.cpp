@@ -1,6 +1,8 @@
-#include "graph_generator.hpp"
+#include "graph/generator.hpp"
 
 using namespace boost;
+
+namespace graph {
 
 Graph generate_random_graph(size_t num_verticies, size_t num_edges, int seed) {
   size_t i = 0, j = 0, count = 0;
@@ -33,3 +35,5 @@ Graph generate_random_graph(size_t num_verticies, size_t num_edges, int seed) {
 
   return g;
 }
+
+} // namespace graph

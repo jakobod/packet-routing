@@ -1,8 +1,11 @@
-#include "actor/transition.hpp"
+#include "actors/transition.hpp"
+
 #include "caf/all.hpp"
 #include "type_ids.hpp"
 
-namespace actor {
+using namespace caf;
+
+namespace actors {
 
 caf::behavior transition_actor(caf::stateful_actor<transition_state>* self,
                                caf::actor node_one, caf::actor node_two) {
@@ -20,4 +23,4 @@ caf::behavior transition_actor(caf::stateful_actor<transition_state>* self,
   };
 }
 
-} // namespace actor
+} // namespace actors

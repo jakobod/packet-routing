@@ -9,12 +9,13 @@
 #include "caf/behavior.hpp"
 #include "caf/stateful_actor.hpp"
 
-namespace actor {
+namespace actors {
 
-struct message_generator_state {
+struct node_state {
   // Nop
+  std::vector<caf::actor> outgoing_transitions;
 };
 
-caf::behavior
-message_generator_actor(caf::stateful_actor<message_generator_state>* self);
-} // namespace actor
+caf::behavior node_actor(caf::stateful_actor<node_state>* self);
+
+} // namespace actors

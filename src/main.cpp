@@ -6,9 +6,9 @@
 
 #include "caf/all.hpp"
 
-#include "actor/node.hpp"
-#include "actor/topology_manager.hpp"
-#include "actor/transition.hpp"
+#include "actors/node.hpp"
+#include "actors/topology_manager.hpp"
+#include "actors/transition.hpp"
 #include "type_ids.hpp"
 
 using namespace caf;
@@ -32,14 +32,14 @@ struct config : caf::actor_system_config {
 
 void caf_main(caf::actor_system& sys, const config& args) {
   scoped_actor self{sys};
-  auto tm = sys.spawn(actor::topology_manager_actor);
+  auto tm = sys.spawn(actors::topology_manager_actor);
   self->send(tm, generate_atom_v, args.num_nodes, args.num_transitions,
              args.seed);
 
-  auto node1 = sys.spawn(actor::node_actor);
-  auto node2 = sys.spawn(actor::node_actor);
+  auto node1 = sys.spawn(actors::node_actor);
+  auto node2 = sys.spawn(actors::node_actor);
 
-  auto transition = sys.spawn(actor::transition_actor, node1, node2);
+  auto transition = sys.spawn(actors::transition_actor, node1, node2);
 
   self->send(node1, emit_message_atom_v, "Initiale Nachricht");
 }

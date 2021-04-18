@@ -9,12 +9,13 @@
 #include "caf/behavior.hpp"
 #include "caf/stateful_actor.hpp"
 
-namespace actor {
+namespace actors {
 
-struct topology_manager_state {
+struct message_generator_state {
   // Nop
 };
 
 caf::behavior
-topology_manager_actor(caf::stateful_actor<topology_manager_state>* self);
-} // namespace actor
+message_generator_actor(caf::stateful_actor<message_generator_state>* self);
+
+} // namespace actors

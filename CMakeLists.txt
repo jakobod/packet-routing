@@ -39,11 +39,11 @@ add_subdirectory(${actor_framework_SOURCE_DIR} ${actor_framework_BINARY_DIR})
 
 # New source files have to be added here
 set(SRC_FILES
-  src/actor/node.cpp
-  src/actor/transition.cpp
-  src/actor/message_generator.cpp
-  src/actor/topology_manager.cpp
-  src/graph_generator.cpp
+  src/actors/node.cpp
+  src/actors/transition.cpp
+  src/actors/message_generator.cpp
+  src/actors/topology_manager.cpp
+  src/graph/generator.cpp
 )
 
 # -- add executables -----------------------------------------------------------
