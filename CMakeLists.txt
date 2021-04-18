@@ -35,6 +35,16 @@ endforeach()
 set(CAF_SANITIZERS "${SANITIZERS}" CACHE INTERNAL "")
 add_subdirectory(${actor_framework_SOURCE_DIR} ${actor_framework_BINARY_DIR})
 
+# -- fetch actor-framework repo ------------------------------------------------
+
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
 # -- project files -------------------------------------------------------------
 
 # New source files have to be added here
@@ -62,3 +72,19 @@ endmacro()
 
 add_target(example) # This is the example project
 add_target(main) # This is the main project file
+
+# -- add test executables -------------------------------------------------------
+
+enable_testing()
+
+add_executable(
+  vas_test
+  src/graph_generator_test.cpp
+)
+target_link_libraries(
+  vas_test
+  gtest_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(vas_test)
