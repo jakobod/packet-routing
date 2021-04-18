@@ -1,6 +1,8 @@
 #include "actors/transition.hpp"
 
-#include "caf/all.hpp"
+#include "caf/actor_ostream.hpp"
+#include "caf/event_based_actor.hpp"
+#include "caf/fwd.hpp"
 #include "type_ids.hpp"
 
 using namespace caf;

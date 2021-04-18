@@ -12,7 +12,6 @@
 namespace actors {
 
 struct node_state {
-  // Nop
   std::vector<caf::actor> transitions;
 };
 
