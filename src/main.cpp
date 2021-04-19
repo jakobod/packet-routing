@@ -42,9 +42,9 @@ void caf_main(actor_system& sys, const config& args) {
   auto node1 = sys.spawn(actors::node_actor);
   auto node2 = sys.spawn(actors::node_actor);
   auto transition = sys.spawn(actors::transition_actor, node1, node2, self);
-  for (int i = 0; i < 2; ++i)
-    self->receive([&](done_atom) { aout(self) << "initialized" << std::endl; });
 
+  // We need to wait for the transition to be initialized
+  self->receive([&](done_atom) { aout(self) << "initialized" << std::endl; });
   self->send(node1, emit_message_atom_v, "Initiale Nachricht");
 
   std::string dummy;
