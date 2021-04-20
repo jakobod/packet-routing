@@ -79,11 +79,17 @@ enable_testing()
 
 add_executable(
   vas_test
+  "${SRC_FILES}"
   test/generator.cpp
 )
+
+target_include_directories(vas_test PRIVATE "header")
+
 target_link_libraries(
   vas_test
   gtest_main
+  CAF::core
+  Boost::graph
 )
 
 include(GoogleTest)

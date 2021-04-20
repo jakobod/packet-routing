@@ -15,6 +15,7 @@ behavior transition_actor(stateful_actor<transition_state>* self,
     .then([=](done_atom d) { self->send(parent, d); });
   self->request(node_two, seconds(1), register_transition_atom_v, self)
     .then([=](done_atom d) { self->send(parent, d); });
+
   return {
     [=](message_atom, const std::string& payload) {
       aout(self) << "[transition]: Got new message" << std::endl;

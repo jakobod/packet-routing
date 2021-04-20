@@ -46,6 +46,10 @@ void caf_main(caf::actor_system& sys, const config& args) {
     self->receive([&](done_atom) { aout(self) << "initialized" << std::endl; });
 
   self->send(node1, emit_message_atom_v, "Initiale Nachricht");
+
+  std::string dummy;
+  std::getline(std::cin, dummy);
+  self->send_exit(transition, exit_reason::user_shutdown);
 }
 
 } // namespace
