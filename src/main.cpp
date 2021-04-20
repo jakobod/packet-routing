@@ -44,7 +44,9 @@ void caf_main(actor_system& sys, const config& args) {
   auto transition = sys.spawn(actors::transition_actor, node1, node2, self);
 
   // We need to wait for the transition to be initialized
-  self->receive([&](done_atom) { aout(self) << "initialized" << std::endl; });
+  int i = 0;
+  self->receive_for(i, 1)([](done_atom) {});
+  aout(self) << "[main]: initialized" << std::endl;
   self->send(node1, emit_message_atom_v, "Initiale Nachricht");
 
   std::string dummy;
