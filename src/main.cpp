@@ -39,20 +39,25 @@ void caf_main(actor_system& sys, const config& args) {
   // self->send(tm, generate_atom_v, args.num_nodes, args.num_transitions,
   //  args.seed);
 
-  auto node1 = sys.spawn(actors::node_actor);
-  auto node2 = sys.spawn(actors::node_actor);
-  auto transition = sys.spawn(actors::transition_actor, node1, node2, self);
+  std::vector<actor> nodes;
+  for (int i = 0; i < args.num_nodes; ++i)
+    nodes.emplace_back(sys.spawn(actors::node_actor));
+  std::vector<actor> transitions;
+  for (size_t i = 1; i < nodes.size(); ++i)
+    transitions.emplace_back(sys.spawn(actors::transition_actor,
+                                       nodes.at(i - 1), nodes.at(i), self, 1));
 
   // We need to wait for the transition to be initialized
-  int i = 0;
-  self->receive_for(i, 1)([](done_atom) {});
+  size_t i = 0;
+  self->receive_for(i, transitions.size())([](done_atom) {});
   aout(self) << "[main]: initialized" << std::endl;
-  self->send(node1, emit_message_atom_v, "Initiale Nachricht");
+  routing::message msg("Hello World!", nodes.back());
+  self->send(nodes.front(), emit_message_atom_v, std::move(msg));
 
   std::string dummy;
   std::getline(std::cin, dummy);
-  self->send_exit(transition, exit_reason::user_shutdown);
-  std::getline(std::cin, dummy);
+  for (const auto& trans : transitions)
+    self->send_exit(trans, exit_reason::user_shutdown);
 }
 
 } // namespace

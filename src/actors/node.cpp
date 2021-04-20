@@ -3,6 +3,7 @@
 #include "caf/actor_ostream.hpp"
 #include "caf/event_based_actor.hpp"
 #include "caf/fwd.hpp"
+#include "routing/message.hpp"
 #include "type_ids.hpp"
 
 using namespace caf;
@@ -26,15 +27,28 @@ behavior node_actor(stateful_actor<node_state>* self) {
             self->monitor(trans);
             return done_atom_v;
           },
-          [=](message_atom, const std::string& payload) {
-            aout(self) << "[node]: got message: " << payload << std::endl;
+          [=](message_atom, routing::message& msg) {
+            if (msg.destination() == self) {
+              aout(self) << "[node]: got message: " << msg << std::endl;
+            } else {
+              aout(self) << "[node]: forwarding message" << std::endl;
+              msg.update_path(self);
+              msg.update_weight(self->state.current_load);
+              // TODO: Update current load accordingly.
+              // TODO: this should be routed according to routing table
+              for (const auto& trans : self->state.transitions) {
+                if (trans != self->current_sender())
+                  self->send(trans, message_atom_v, std::move(msg));
+              }
+            }
           },
-          [=](emit_message_atom, const std::string& payload) {
+          [=](emit_message_atom, routing::message& msg) {
             aout(self) << "[node]: emitting message" << std::endl;
             // TODO: Make real stuff happening
-            for (const auto& transition : self->state.transitions) {
-              self->send(transition, message_atom_v, payload);
-            }
+            msg.update_path(self);
+            msg.update_weight(self->state.current_load);
+            for (const auto& transition : self->state.transitions)
+              self->send(transition, message_atom_v, std::move(msg));
           }};
 }
 

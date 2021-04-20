@@ -12,12 +12,11 @@
 namespace actors {
 
 struct transition_state {
-  caf::actor node_one;
-  caf::actor node_two;
+  uint64_t weight;
 };
 
 caf::behavior transition_actor(caf::stateful_actor<transition_state>* self,
                                caf::actor node_one, caf::actor node_two,
-                               caf::actor parent);
+                               caf::actor parent, uint64_t weight);
 
 } // namespace actors

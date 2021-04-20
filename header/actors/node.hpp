@@ -13,6 +13,7 @@ namespace actors {
 
 struct node_state {
   std::vector<caf::actor> transitions;
+  uint64_t current_load = 1;
 };
 
 caf::behavior node_actor(caf::stateful_actor<node_state>* self);
