@@ -4,7 +4,9 @@
 #include <sstream>
 
 #include "caf/actor_ostream.hpp"
-#include "caf/all.hpp"
+#include "caf/event_based_actor.hpp"
+#include "caf/fwd.hpp"
+#include "caf/local_actor.hpp"
 #include "caf/stateful_actor.hpp"
 #include "graph/generator.hpp"
 #include "type_ids.hpp"
@@ -19,7 +21,6 @@ behavior topology_manager_actor(stateful_actor<topology_manager_state>* self) {
       auto graph = graph::generate_random_graph(num_nodes, num_transitions,
                                                 seed);
       aout(self) << "Generated graph:" << std::endl;
-
       std::stringstream ss;
       boost::write_graphviz(ss, graph);
       aout(self) << ss.str() << std::endl;
