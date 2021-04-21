@@ -13,6 +13,7 @@
 #include "actors/topology_manager.hpp"
 #include "actors/transition.hpp"
 #include "type_ids.hpp"
+#include "actors/message_generator.hpp"
 
 using namespace caf;
 
@@ -42,6 +43,7 @@ void caf_main(actor_system& sys, const config& args) {
   auto node1 = sys.spawn(actors::node_actor);
   auto node2 = sys.spawn(actors::node_actor);
   auto transition = sys.spawn(actors::transition_actor, node1, node2, self);
+  auto messageGenerator = sys.spawn(actors::message_generator_actor);
 
   // We need to wait for the transition to be initialized
   int i = 0;
@@ -50,6 +52,10 @@ void caf_main(actor_system& sys, const config& args) {
   self->send(node1, emit_message_atom_v, "Initiale Nachricht");
 
   std::string dummy;
+  using namespace std::literals::chrono_literals;
+  self->delayed_send(messageGenerator, 2000ms, add_node_atom_v, node1);
+  self->delayed_send(messageGenerator, 3000ms, add_node_atom_v, node2);
+  //self->delayed_send(messageGenerator, 5000ms, remove_node_atom_v, node2);
   std::getline(std::cin, dummy);
   self->send_exit(transition, exit_reason::user_shutdown);
 

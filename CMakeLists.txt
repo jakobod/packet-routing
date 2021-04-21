@@ -18,7 +18,7 @@ endif ()
 
 # -- add external libraries ----------------------------------------------------
 
-find_package(Boost 1.71 COMPONENTS graph REQUIRED)
+find_package(Boost 1.65 COMPONENTS graph REQUIRED)
 
 # -- fetch actor-framework repo ------------------------------------------------
 
