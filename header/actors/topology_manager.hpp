@@ -24,6 +24,6 @@ struct topology_manager_state {
 };
 
 caf::behavior
-topology_manager_actor(caf::stateful_actor<topology_manager_state>* self);
+topology_manager_actor(caf::stateful_actor<topology_manager_state>* self, caf::actor message_generator);
 
 } // namespace actors
