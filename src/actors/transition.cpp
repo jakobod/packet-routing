@@ -27,7 +27,7 @@ behavior transition_actor(stateful_actor<transition_state>* self,
         self->send(node_two, message_atom_v, std::move(payload));
       } else {
         aout(self) << "[transition]: Sending to node1" << std::endl;
-        self->send(node_one, std::move(payload));
+        self->send(node_one, message_atom_v, std::move(payload));
       }
     },
   };

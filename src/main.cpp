@@ -13,6 +13,7 @@
 #include "actors/topology_manager.hpp"
 #include "actors/transition.hpp"
 #include "type_ids.hpp"
+#include "actors/message_generator.hpp"
 
 using namespace caf;
 

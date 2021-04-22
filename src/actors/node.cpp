@@ -33,7 +33,7 @@ behavior node_actor(stateful_actor<node_state>* self) {
             aout(self) << "[node]: emitting message" << std::endl;
             // TODO: Make real stuff happening
             for (const auto& transition : self->state.transitions) {
-              self->send(transition, message_atom_v, payload);
+              self->send(transition, message_atom_v, std::move(payload));
             }
           }};
 }

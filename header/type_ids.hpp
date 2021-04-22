@@ -24,5 +24,8 @@ CAF_BEGIN_TYPE_ID_BLOCK(packet_routing, caf::first_custom_type_id)
   CAF_ADD_ATOM(packet_routing, register_transition_atom)
   CAF_ADD_ATOM(packet_routing, message_atom)
   CAF_ADD_ATOM(packet_routing, emit_message_atom)
+  CAF_ADD_ATOM(packet_routing, generate_message_atom)
+  CAF_ADD_ATOM(packet_routing, add_node_atom)
+  CAF_ADD_ATOM(packet_routing, remove_node_atom)
 
 CAF_END_TYPE_ID_BLOCK(packet_routing)
