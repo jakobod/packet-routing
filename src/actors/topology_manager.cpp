@@ -35,16 +35,16 @@ behavior topology_manager_actor(stateful_actor<topology_manager_state>* self) {
 
       aout(self) << "[topo] Adding nodes" << std::endl;
       for (int node : graph::get_verteces(graph)) {
-        self->state.nodes[node] = self->spawn(node_actor, node, self);
+        self->state.nodes[node] = self->spawn(node_actor, node, seed, self);
       }
 
       aout(self) << "[topo] Adding transitions" << std::endl;
       for (auto const& edge : graph::get_edges(graph)) {
-        EdgeIndex index = std::make_pair(std::get<0>(edge), std::get<1>(edge));
-        auto node_one = self->state.nodes[index.first];
-        auto node_two = self->state.nodes[index.second];
-        self->state.transitions[index] = self->spawn(
-          transition_actor, node_one, index.first, node_two, index.second, self, 10);
+        auto[first, second, weight] = edge;
+        auto node_one = self->state.nodes[first];
+        auto node_two = self->state.nodes[second];
+        self->state.transitions[std::make_pair(first, second)] = self->spawn(
+          transition_actor, node_one, first, node_two, second, self, 10);
       }
 
       aout(self) << "[topo] Finished building graph with "
@@ -57,7 +57,7 @@ behavior topology_manager_actor(stateful_actor<topology_manager_state>* self) {
       if (state.initialized_transitions >= graph::num_edges(state.graph)) {
         aout(self) << "[topo] Transitions initialized" << std::endl;
         routing::message msg("Hello World!", self->state.nodes[0]);
-        self->send(self->state.nodes[3], emit_message_atom_v, msg);
+        self->send(self->state.nodes[3], message_atom_v, msg);
       }
     }};
 }
