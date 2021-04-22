@@ -16,6 +16,7 @@ behavior transition_actor(stateful_actor<transition_state>* self,
                           actor node_one, actor node_two, actor parent,
                           uint64_t weight) {
   std::vector<actor> nodes{node_one, node_two};
+  self->link_to(parent);
   self
     ->fan_out_request<policy::select_all>(nodes, infinite,
                                           register_transition_atom_v, self)

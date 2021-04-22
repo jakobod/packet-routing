@@ -10,7 +10,8 @@ using namespace caf;
 
 namespace actors {
 
-behavior node_actor(stateful_actor<node_state>* self) {
+behavior node_actor(stateful_actor<node_state>* self, actor parent) {
+  self->link_to(parent);
   self->set_down_handler([=](const down_msg& msg) {
     aout(self) << "down: transition " << msg.source << " down. Reason "
                << msg.reason << std::endl;

@@ -16,6 +16,6 @@ struct node_state {
   uint64_t current_load = 1;
 };
 
-caf::behavior node_actor(caf::stateful_actor<node_state>* self);
+caf::behavior node_actor(caf::stateful_actor<node_state>* self, caf::actor parent);
 
 } // namespace actors
