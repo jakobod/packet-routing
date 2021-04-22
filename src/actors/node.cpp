@@ -4,13 +4,15 @@
 #include "caf/event_based_actor.hpp"
 #include "caf/fwd.hpp"
 #include "routing/message.hpp"
+#include <random>
 #include "type_ids.hpp"
 
 using namespace caf;
 
 namespace actors {
 
-behavior node_actor(stateful_actor<node_state>* self, actor parent) {
+behavior node_actor(stateful_actor<node_state>* self, int node_index, actor parent) {
+  self->state.node_index = node_index;
   self->link_to(parent);
   self->set_down_handler([=](const down_msg& msg) {
     aout(self) << "down: transition " << msg.source << " down. Reason "
@@ -35,12 +37,18 @@ behavior node_actor(stateful_actor<node_state>* self, actor parent) {
               aout(self) << "[node]: forwarding message" << std::endl;
               msg.update_path(self);
               msg.update_weight(self->state.current_load);
+
+              std::mt19937 gen(
+                msg.path_length()); 
+              std::uniform_int_distribution<> distrib(0, self->state.transitions.size() - 1);
               // TODO: Update current load accordingly.
               // TODO: this should be routed according to routing table
-              for (const auto& trans : self->state.transitions) {
-                if (trans != self->current_sender())
-                  self->send(trans, message_atom_v, std::move(msg));
+              auto& trans = self->state.transitions.at(distrib(gen));
+              while (self->state.transitions.size() > 1 && trans != self->current_sender()) {
+                trans = self->state.transitions.at(distrib(gen));
               }
+              
+               self->send(trans, message_atom_v, std::move(msg));
             }
           },
           [=](emit_message_atom, routing::message& msg) {

@@ -14,6 +14,7 @@ namespace actors {
 struct node_state {
   std::vector<caf::actor> transitions;
   uint64_t current_load = 1;
+  int node_index;
 };
 
 caf::behavior node_actor(caf::stateful_actor<node_state>* self, caf::actor parent);

@@ -20,7 +20,7 @@ Graph generate_random_graph(size_t num_verticies, size_t num_edges, int seed) {
       continue;
     else {
       for (j = 0; j < i; j++) {
-        if ((std::get<0>(edges[i]) == std::get<1>(edges[j])
+        if ((std::get<0>(edges[i]) == std::get<0>(edges[j])
              && std::get<1>(edges[i]) == std::get<1>(edges[j]))
             || (std::get<0>(edges[i]) == std::get<1>(edges[j])
                 && std::get<1>(edges[i]) == std::get<0>(edges[j])))
