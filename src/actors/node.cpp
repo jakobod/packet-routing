@@ -50,7 +50,8 @@ behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed,
 
               std::uniform_int_distribution<> distrib(
                 0, self->state.transitions.size() - 1);
-              auto& trans = self->state.transitions.at(distrib(self->state.generator));
+              auto& trans
+                = self->state.transitions.at(distrib(self->state.generator));
               self->send(trans, message_atom_v, std::move(msg));
             }
           }};

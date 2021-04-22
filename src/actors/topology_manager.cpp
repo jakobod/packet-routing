@@ -16,7 +16,8 @@ using namespace caf;
 
 namespace actors {
 
-behavior topology_manager_actor(stateful_actor<topology_manager_state>* self, actor message_generator) {
+behavior topology_manager_actor(stateful_actor<topology_manager_state>* self,
+                                actor message_generator) {
   self->state.initialized_transitions = 0;
 
   return {
@@ -35,14 +36,14 @@ behavior topology_manager_actor(stateful_actor<topology_manager_state>* self, ac
 
       aout(self) << "[topo] Adding nodes" << std::endl;
       for (int node : graph::get_verteces(graph)) {
-        auto node_ref =  self->spawn(node_actor, node, seed, self);
+        auto node_ref = self->spawn(node_actor, node, seed, self);
         self->state.nodes[node] = node_ref;
         self->send(message_generator, add_node_atom_v, node_ref);
       }
 
       aout(self) << "[topo] Adding transitions" << std::endl;
       for (auto const& edge : graph::get_edges(graph)) {
-        auto[first, second, weight] = edge;
+        auto [first, second, weight] = edge;
         auto node_one = self->state.nodes[first];
         auto node_two = self->state.nodes[second];
         self->state.transitions[std::make_pair(first, second)] = self->spawn(

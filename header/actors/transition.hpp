@@ -16,7 +16,6 @@ using EdgeIndex = std::pair<int, int>;
 
 struct transition_state {
   uint64_t weight;
-
   EdgeIndex index;
 };
 

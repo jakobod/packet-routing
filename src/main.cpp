@@ -6,13 +6,11 @@
 
 #include "caf/all.hpp"
 
-#include <condition_variable>
-#include <mutex>
+#include <chrono>
 
 #include "actors/message_generator.hpp"
-#include "actors/node.hpp"
 #include "actors/topology_manager.hpp"
-#include "actors/transition.hpp"
+
 #include "type_ids.hpp"
 
 using namespace caf;
@@ -36,13 +34,10 @@ struct config : actor_system_config {
 
 void caf_main(actor_system& sys, const config& args) {
   scoped_actor self{sys};
-
-  auto mg = sys.spawn(actors::message_generator_actor, 10000, args.seed);
-
+  auto mg = sys.spawn(actors::message_generator, 10000, args.seed);
   auto tm = sys.spawn(actors::topology_manager_actor, mg);
   self->send(tm, generate_atom_v, args.num_nodes, args.num_transitions,
              args.seed);
-
   std::string dummy;
   std::getline(std::cin, dummy);
 }
