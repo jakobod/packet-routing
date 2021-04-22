@@ -29,7 +29,7 @@ behavior topology_manager_actor(stateful_actor<topology_manager_state>* self) {
       aout(self) << ss.str() << std::endl;
 
       aout(self) << "[topo] Adding nodes" << std::endl;
-      for(auto const& node : graph::get_verteces(graph)) {
+      for(int node : graph::get_verteces(graph)) {
         self->state.nodes[node] = self->spawn(node_actor);
       }
 
@@ -40,6 +40,8 @@ behavior topology_manager_actor(stateful_actor<topology_manager_state>* self) {
         auto node_two = self->state.nodes[index.second];
         self->state.transitions[index] = self->spawn(transition_actor, node_one, node_two, self);
       }
+
+      aout(self) << "[topo] Finished building graph" << std::endl;
     },
     [=](done_atom) {
       topology_manager_state state = self->state;

@@ -60,6 +60,9 @@ set(SRC_FILES
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_BUILD_TYPE DEBUG)
+
 macro(add_target name)
   add_executable(${name}
                  "src/${name}.cpp"
