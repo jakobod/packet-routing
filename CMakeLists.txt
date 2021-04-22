@@ -49,11 +49,13 @@ FetchContent_MakeAvailable(googletest)
 
 # New source files have to be added here
 set(SRC_FILES
-  src/actors/node.cpp
-  src/actors/transition.cpp
   src/actors/message_generator.cpp
+  src/actors/node.cpp
   src/actors/topology_manager.cpp
+  src/actors/transition.cpp
   src/graph/generator.cpp
+  src/routing/message.cpp
+  src/routing/table.cpp
 )
 
 # -- add executables -----------------------------------------------------------

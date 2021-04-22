@@ -36,9 +36,32 @@ struct config : actor_system_config {
 
 void caf_main(actor_system& sys, const config& args) {
   scoped_actor self{sys};
-  auto tm = sys.spawn(actors::topology_manager_actor);
-  self->send(tm, generate_atom_v, args.num_nodes, args.num_transitions,
-   args.seed);
+  //auto tm = sys.spawn(actors::topology_manager_actor);
+  //self->send(tm, generate_atom_v, args.num_nodes, args.num_transitions,
+  // args.seed);
+  // auto tm = sys.spawn(actors::topology_manager_actor);
+  // self->send(tm, generate_atom_v, args.num_nodes, args.num_transitions,
+  //  args.seed);
+
+  std::vector<actor> nodes;
+  for (int i = 0; i < args.num_nodes; ++i)
+    nodes.emplace_back(sys.spawn(actors::node_actor));
+  std::vector<actor> transitions;
+  for (size_t i = 1; i < nodes.size(); ++i)
+    transitions.emplace_back(sys.spawn(actors::transition_actor,
+                                       nodes.at(i - 1), nodes.at(i), self, 1));
+
+  // We need to wait for the transition to be initialized
+  size_t i = 0;
+  self->receive_for(i, transitions.size())([](done_atom) {});
+  aout(self) << "[main]: initialized" << std::endl;
+  routing::message msg("Hello World!", nodes.back());
+  self->send(nodes.front(), emit_message_atom_v, std::move(msg));
+
+  std::string dummy;
+  std::getline(std::cin, dummy);
+  for (const auto& trans : transitions)
+    self->send_exit(trans, exit_reason::user_shutdown);
 }
 
 } // namespace

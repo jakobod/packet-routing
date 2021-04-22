@@ -8,10 +8,12 @@
 
 #include "caf/type_id.hpp"
 
+#include "routing/message.hpp"
+
 CAF_BEGIN_TYPE_ID_BLOCK(packet_routing, caf::first_custom_type_id)
 
   // Every CUSTOM type has to be declared here! CAF messages use
-  // CAF_ADD_TYPE_ID(packet_routing, (some_type))
+  CAF_ADD_TYPE_ID(packet_routing, (routing::message))
 
   // Atoms are trait types that are only used for identifying messages.
   CAF_ADD_ATOM(packet_routing, tell_atom)
