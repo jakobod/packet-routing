@@ -9,15 +9,19 @@
 
 namespace graph {
 
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS>
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, boost::no_property, boost::property<boost::edge_weight_t, int>>
   Graph;
-typedef std::pair<int, int> Edge;
+typedef std::tuple<int, int, int> Edge;
 
 typedef int Vertex;
 
 Graph generate_random_graph(size_t num_verticies, size_t num_edges, int seed);
 
-
 std::vector<Vertex> get_verteces(Graph graph);
 
+std::vector<Edge> get_edges(Graph graph);
+
+int num_verteces(Graph graph);
+
+int num_edges(Graph graph);
 } // namespace graph

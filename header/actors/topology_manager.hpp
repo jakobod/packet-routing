@@ -8,11 +8,19 @@
 
 #include "caf/behavior.hpp"
 #include "caf/stateful_actor.hpp"
+#include "graph/generator.hpp"
 
 namespace actors {
 
+typedef std::pair<int, int> EdgeIndex;
+
 struct topology_manager_state {
-  // Nop
+  std::map<EdgeIndex, caf::actor> transitions;
+  std::map<int, caf::actor> nodes;
+
+  int initialized_transitions;
+
+  graph::Graph graph;
 };
 
 caf::behavior

@@ -34,3 +34,4 @@ behavior transition_actor(stateful_actor<transition_state>* self,
 }
 
 } // namespace actors
+
