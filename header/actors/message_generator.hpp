@@ -20,6 +20,6 @@ struct message_generator_state {
 };
 
 caf::behavior
-message_generator_actor(caf::stateful_actor<message_generator_state>* self);
+message_generator_actor(caf::stateful_actor<message_generator_state>* self,  size_t maxWaitTime, size_t seed);
 
 } // namespace actors 
