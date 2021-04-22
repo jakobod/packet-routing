@@ -25,7 +25,7 @@ behavior transition_actor(stateful_actor<transition_state>* self,
   self->state.weight = weight;
   return {
     [=](message_atom, routing::message& msg) {
-      aout(self) << "[transition]: forwarding message" << std::endl;
+      //aout(self) << "[transition]: forwarding message" << std::endl;
       msg.update_weight(self->state.weight);
       if (self->current_sender() == node_one)
         self->send(node_two, message_atom_v, std::move(msg));

@@ -42,9 +42,9 @@ behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed,
             if (msg.destination() == self) {
               self->state.print(self, "Got message: " + msg.content());
             } else {
-              self->state.print(self, "Forwarding message: " + msg.content()
-                                        + " Path lenght: "
-                                        + std::to_string(msg.path_length()));
+              //self->state.print(self, "Forwarding message: " + msg.content()
+              //                          + " Path lenght: "
+              //                          + std::to_string(msg.path_length()));
               msg.update_path(self);
               msg.update_weight(self->state.current_load);
 
