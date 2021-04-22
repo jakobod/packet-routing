@@ -19,7 +19,7 @@ message_generator_actor(caf::stateful_actor<message_generator_state>* self, size
             if (self->state.nodes.size() > 0) {
               std::uniform_int_distribution<> randNode(0, self->state.nodes.size() -1);
               size_t nodeIndex = randNode(self->state.gen);
-              self->send(self->state.nodes[nodeIndex], emit_message_atom_v, "Hello");
+              self->send(self->state.nodes[nodeIndex], message_atom_v, "Hello");
               aout(self) << "[Message Generator]: Generating new message for " << nodeIndex << " out of " << self->state.nodes.size() << " Nodes" << std::endl;
             }
             std::chrono::milliseconds waitTime = std::chrono::milliseconds(self->state.randWaitTime(self->state.gen));
