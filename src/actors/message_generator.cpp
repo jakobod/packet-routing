@@ -10,10 +10,9 @@
 namespace actors {
 
 caf::behavior
-message_generator_actor(caf::stateful_actor<message_generator_state>* self) {
-  int seed = 123456789;
+message_generator_actor(caf::stateful_actor<message_generator_state>* self, size_t maxWaitTime, size_t seed ) {
   self->state.gen = std::mt19937(seed);
-  self->state.randWaitTime= std::uniform_int_distribution<>(0, 1000 - 1);
+  self->state.randWaitTime= std::uniform_int_distribution<>(0, maxWaitTime - 1);
   using namespace std::literals::chrono_literals;
   self->delayed_send(self, std::chrono::milliseconds(self->state.randWaitTime(self->state.gen)), generate_message_atom_v);
   return {[=](generate_message_atom) {
