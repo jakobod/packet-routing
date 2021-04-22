@@ -44,10 +44,10 @@ struct message {
   }
 
 private:
-  std::string content_;
+  std::string content_ = "";
   caf::actor destination_;
   std::vector<caf::actor> path_;
-  uint64_t path_length_;
+  uint64_t path_length_ = 0;
 };
 
 } // namespace routing

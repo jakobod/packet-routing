@@ -7,7 +7,10 @@ include(FetchContent)
 
 # -- set useful CMake options --------------------------------------------------
 
-add_compile_options("-std=c++17")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
 
 # Enable ASAN if requested by the user.
 if (CAF_ENABLE_ADDRESS_SANITIZER AND NOT WIN32)
@@ -61,9 +64,6 @@ set(SRC_FILES
 # -- add executables -----------------------------------------------------------
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_BUILD_TYPE DEBUG)
 
 macro(add_target name)
   add_executable(${name}

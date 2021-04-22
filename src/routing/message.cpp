@@ -17,7 +17,9 @@ using namespace caf;
 namespace routing {
 
 message::message(std::string content, actor destination)
-  : content_(std::move(content)), destination_(std::move(destination)) {
+  : content_(std::move(content)),
+    destination_(std::move(destination)),
+    path_length_(0) {
   // nop
 }
 
