@@ -12,7 +12,7 @@
 
 namespace actors {
 
-typedef std::pair<int, int> EdgeIndex;
+using EdgeIndex = std::pair<int, int>;
 
 struct topology_manager_state {
   std::map<EdgeIndex, caf::actor> transitions;

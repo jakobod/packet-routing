@@ -13,8 +13,9 @@ using namespace std::chrono;
 namespace actors {
 
 behavior transition_actor(stateful_actor<transition_state>* self,
-                          actor node_one, actor node_two, actor parent,
-                          uint64_t weight) {
+                          actor node_one, int node_one_index, actor node_two,
+                          int node_two_index, actor parent, int weight) {
+  self->state.index = std::make_pair(node_one_index, node_two_index);
   std::vector<actor> nodes{node_one, node_two};
   self->link_to(parent);
   self
@@ -29,10 +30,9 @@ behavior transition_actor(stateful_actor<transition_state>* self,
       if (self->current_sender() == node_one)
         self->send(node_two, message_atom_v, std::move(msg));
       else
-        self->send(node_one, std::move(msg));
+        self->send(node_one, message_atom_v, std::move(msg));
     },
   };
 }
 
 } // namespace actors
-

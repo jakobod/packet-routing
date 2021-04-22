@@ -5,12 +5,22 @@
 #include "caf/fwd.hpp"
 #include "routing/message.hpp"
 #include "type_ids.hpp"
+#include <random>
+#include <string>
 
 using namespace caf;
 
 namespace actors {
 
-behavior node_actor(stateful_actor<node_state>* self, actor parent) {
+void node_state::print(stateful_actor<node_state>* actor_stuff,
+                       std::string msg) {
+  aout(actor_stuff) << "[node " << node_index << "]: " << msg << std::endl;
+}
+
+behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed,
+                    actor parent) {
+  self->state.generator = std::mt19937(seed);
+  self->state.node_index = node_index;
   self->link_to(parent);
   self->set_down_handler([=](const down_msg& msg) {
     aout(self) << "down: transition " << msg.source << " down. Reason "
@@ -23,33 +33,26 @@ behavior node_actor(stateful_actor<node_state>* self, actor parent) {
                       end(transitions));
   });
   return {[=](register_transition_atom, actor trans) {
-            aout(self) << "[node]: Got new transition " << trans << std::endl;
+            self->state.print(self, "Got new transition " + to_string(trans));
             self->state.transitions.push_back(trans);
             self->monitor(trans);
             return done_atom_v;
           },
           [=](message_atom, routing::message& msg) {
             if (msg.destination() == self) {
-              aout(self) << "[node]: got message: " << msg << std::endl;
+              self->state.print(self, "Got message: " + msg.content());
             } else {
-              aout(self) << "[node]: forwarding message" << std::endl;
+              self->state.print(self, "Forwarding message: " + msg.content()
+                                        + " Path lenght: "
+                                        + std::to_string(msg.path_length()));
               msg.update_path(self);
               msg.update_weight(self->state.current_load);
-              // TODO: Update current load accordingly.
-              // TODO: this should be routed according to routing table
-              for (const auto& trans : self->state.transitions) {
-                if (trans != self->current_sender())
-                  self->send(trans, message_atom_v, std::move(msg));
-              }
+
+              std::uniform_int_distribution<> distrib(
+                0, self->state.transitions.size() - 1);
+              auto& trans = self->state.transitions.at(distrib(self->state.generator));
+              self->send(trans, message_atom_v, std::move(msg));
             }
-          },
-          [=](emit_message_atom, routing::message& msg) {
-            aout(self) << "[node]: emitting message" << std::endl;
-            // TODO: Make real stuff happening
-            msg.update_path(self);
-            msg.update_weight(self->state.current_load);
-            for (const auto& transition : self->state.transitions)
-              self->send(transition, message_atom_v, std::move(msg));
           }};
 }
 
