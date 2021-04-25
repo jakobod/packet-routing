@@ -1,3 +1,9 @@
+/**
+ * @author Jakob Otto
+ * @email jakob.otto@haw-hamburg.de
+ * @file edge.cpp
+ */
+
 #include "graph/edge.hpp"
 
 namespace graph {

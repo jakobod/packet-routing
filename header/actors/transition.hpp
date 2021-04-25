@@ -11,7 +11,7 @@
 
 namespace actors {
 
-using ActorPair = std::pair<caf::actor, int>;
+using node_pair = std::pair<caf::actor, int>;
 using EdgeIndex = std::pair<int, int>;
 
 struct transition_state {
@@ -20,8 +20,7 @@ struct transition_state {
 };
 
 caf::behavior transition_actor(caf::stateful_actor<transition_state>* self,
-                               caf::actor node_one, int node_one_index,
-                               caf::actor node_two, int node_two_index,
+                               node_pair node_1, node_pair node_2,
                                caf::actor parent, int weight);
 
 } // namespace actors

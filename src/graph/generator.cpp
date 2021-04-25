@@ -14,7 +14,6 @@ undirected_graph generate_random_graph(size_t num_verticies, size_t num_edges,
   std::uniform_int_distribution<> distrib(0, num_verticies - 1);
   std::uniform_int_distribution<> edge_distrib(0, 100);
   edge_list edges;
-
   while (edges.size() < num_edges) {
     edge new_edge{distrib(gen), distrib(gen), edge_distrib(gen)};
     // Does the edge connect the same node?
@@ -42,10 +41,9 @@ vertex_list get_verteces(const undirected_graph& g) {
 }
 
 edge_list get_edges(const undirected_graph& g) {
-  std::vector<edge> result;
   auto vertex_id = boost::get(vertex_index, g);
   auto weightmap = boost::get(boost::edge_weight, g);
-
+  edge_list result;
   for (auto ei = boost::edges(g).first; ei != boost::edges(g).second; ++ei) {
     auto src = boost::source(*ei, g), targ = boost::target(*ei, g);
     auto weight = get(weightmap, *ei);

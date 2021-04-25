@@ -1,3 +1,9 @@
+/**
+ * @author Jakob Otto
+ * @email jakob.otto@haw-hamburg.de
+ * @file edge.hpp
+ */
+
 #pragma once
 
 #include <cstddef>
