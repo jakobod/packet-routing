@@ -18,7 +18,7 @@ struct topology_manager_state {
   std::map<EdgeIndex, caf::actor> transitions;
   std::map<int, caf::actor> nodes;
   size_t initialized_transitions = 0;
-  graph::Graph graph;
+  graph::undirected_graph graph;
 };
 
 caf::behavior

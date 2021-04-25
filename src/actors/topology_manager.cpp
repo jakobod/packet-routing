@@ -22,27 +22,22 @@ behavior topology_manager_actor(stateful_actor<topology_manager_state>* self,
 
   return {
     [=](generate_atom, size_t num_nodes, size_t num_transitions, int seed) {
-      auto graph = graph::generate_random_graph(num_nodes, num_transitions,
-                                                seed);
+      auto g = graph::generate_random_graph(num_nodes, num_transitions, seed);
 
-      self->state.graph = graph;
-      std::ofstream graph_log;
-      graph_log.open("graph.log");
-
-      boost::write_graphviz(graph_log, graph);
-      graph_log.close();
+      self->state.graph = g;
+      graph::log_graph(g);
       aout(self) << "[topo] Generated graph. Written to graph.log."
                  << std::endl;
 
       aout(self) << "[topo] Adding nodes" << std::endl;
-      for (int node : graph::get_verteces(graph)) {
+      for (int node : graph::get_verteces(g)) {
         auto node_ref = self->spawn(node_actor, node, seed, self);
         self->state.nodes[node] = node_ref;
         self->send(message_generator, add_node_atom_v, node_ref);
       }
 
       aout(self) << "[topo] Adding transitions" << std::endl;
-      for (auto const& edge : graph::get_edges(graph)) {
+      for (auto const& edge : graph::get_edges(g)) {
         auto [first, second, weight] = edge;
         auto node_one = self->state.nodes[first];
         auto node_two = self->state.nodes[second];
@@ -51,8 +46,8 @@ behavior topology_manager_actor(stateful_actor<topology_manager_state>* self,
       }
 
       aout(self) << "[topo] Finished building graph with "
-                 << graph::num_edges(graph) << " edges and "
-                 << graph::num_verteces(graph) << " verteces." << std::endl;
+                 << graph::num_edges(g) << " edges and "
+                 << graph::num_verteces(g) << " verteces." << std::endl;
     },
     [=](done_atom) {
       auto& state = self->state;
