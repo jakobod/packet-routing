@@ -27,11 +27,11 @@ struct message {
 
   uint64_t path_length();
 
-  const std::vector<caf::actor>& path();
+  const std::vector<int>& path();
 
   // -- public-API -------------------------------------------------------------
 
-  void update_path(caf::actor current_hop);
+  void update_path(int current_hop);
 
   void update_weight(uint64_t weight);
 
@@ -46,7 +46,7 @@ struct message {
 private:
   std::string content_ = "";
   caf::actor destination_;
-  std::vector<caf::actor> path_;
+  std::vector<int> path_;
   uint64_t path_length_ = 0;
 };
 

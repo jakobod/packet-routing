@@ -37,13 +37,13 @@ uint64_t message::path_length() {
   return path_length_;
 }
 
-const std::vector<caf::actor>& message::path() {
+const std::vector<int>& message::path() {
   return path_;
 }
 
 // -- public-API -------------------------------------------------------------
 
-void message::update_path(caf::actor current_hop) {
+void message::update_path(int current_hop) {
   path_.emplace_back(current_hop);
 }
 

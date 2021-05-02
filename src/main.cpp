@@ -34,7 +34,7 @@ struct config : actor_system_config {
 
 void caf_main(actor_system& sys, const config& args) {
   scoped_actor self{sys};
-  auto mg = sys.spawn(actors::message_generator, 10000, args.seed);
+  auto mg = sys.spawn(actors::message_generator, 5000, args.seed);
   auto tm = sys.spawn(actors::topology_manager_actor, mg);
   self->send(tm, generate_atom_v, args.num_nodes, args.num_transitions,
              args.seed);

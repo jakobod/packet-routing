@@ -6,6 +6,7 @@
 #include "routing/message.hpp"
 #include "type_ids.hpp"
 #include <random>
+#include <vector>
 #include <string>
 
 using namespace caf;
@@ -41,11 +42,12 @@ behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed,
           [=](message_atom, routing::message& msg) {
             if (msg.destination() == self) {
               self->state.print(self, "Got message: " + msg.content());
+              aout(self) << "[node] Hops: " << msg.path() << std::endl;
             } else {
               //self->state.print(self, "Forwarding message: " + msg.content()
               //                          + " Path lenght: "
               //                          + std::to_string(msg.path_length()));
-              msg.update_path(self);
+              msg.update_path(self->state.node_index);
               msg.update_weight(self->state.current_load);
 
               std::uniform_int_distribution<> distrib(
