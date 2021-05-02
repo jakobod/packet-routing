@@ -17,6 +17,7 @@ using EdgeIndex = std::pair<int, int>;
 struct transition_state {
   uint64_t weight;
   EdgeIndex index;
+  size_t received_dones = 0;
 };
 
 caf::behavior transition_actor(caf::stateful_actor<transition_state>* self,

@@ -12,6 +12,7 @@
 
 #include "caf/actor.hpp"
 #include "routing/entry.hpp"
+#include "routing/message.hpp"
 
 namespace routing {
 
@@ -21,12 +22,14 @@ class table {
   using routing_map = std::unordered_map<int, entry_list>;
 
 public:
-  table(int seed);
+  table();
   ~table();
 
+  void init(int seed);
+
   void update(const message& msg);
-  void delete_route(const caf::actor& dest);
-  caf::actor get_route(int source);
+  void delete_route(int node_id);
+  int get_route(int dest);
 
 private:
   routing_map routes;

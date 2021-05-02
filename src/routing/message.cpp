@@ -25,7 +25,7 @@ message::message(std::string content, int destination, int source)
 
 // -- members ----------------------------------------------------------------
 
-const std::string& message::content() {
+const std::string& message::content() const {
   return content_;
 }
 
@@ -37,7 +37,7 @@ const int message::source() const {
   return source_;
 }
 
-uint64_t message::last_weight() {
+uint64_t message::last_weight() const {
   return last_weight_;
 }
 
@@ -53,6 +53,10 @@ void message::update_path(int current_hop) {
 
 void message::update_weight(uint64_t weight) {
   last_weight_ = weight;
+}
+
+bool message::path_contains(int node_id) const {
+  return std::find(path_.begin(), path_.end(), node_id) != path_.end();
 }
 
 } // namespace routing

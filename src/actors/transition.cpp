@@ -16,11 +16,8 @@ behavior transition_actor(caf::stateful_actor<transition_state>* self,
                           int weight) {
   self->link_to(parent);
   self->state.index = std::make_pair(node_1.second, node_2.second);
-  std::vector<actor> nodes{node_1.first, node_2.first};
-  self
-    ->fan_out_request<policy::select_all>(nodes, infinite,
-                                          register_transition_atom_v, self)
-    .then([=](std::vector<done_atom>) { self->send(parent, done_atom_v); });
+  self->send(node_1.first, register_transition_atom_v, self, node_2.second);
+  self->send(node_2.first, register_transition_atom_v, self, node_1.second);
   self->state.weight = weight;
   return {
     [=](message_atom, routing::message& msg) {
@@ -29,6 +26,10 @@ behavior transition_actor(caf::stateful_actor<transition_state>* self,
         self->send(node_2.first, message_atom_v, std::move(msg));
       else
         self->send(node_1.first, message_atom_v, std::move(msg));
+    },
+    [=](done_atom) {
+      if (++self->state.received_dones == 2)
+        self->send(parent, done_atom_v);
     },
   };
 }

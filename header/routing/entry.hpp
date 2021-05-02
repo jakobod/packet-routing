@@ -14,20 +14,34 @@
 namespace routing {
 
 struct entry {
+  // -- Constructors -----------------------------------------------------------
+
+  entry(int next_hop_index);
+
+  // -- public API -------------------------------------------------------------
+
+  double value() const;
+
+  void update(uint64_t weight);
+
+  void decay();
+
+  // -- equality operators -----------------------------------------------------
+
   bool operator==(const entry& other) const;
   bool operator!=(const entry& other) const;
-  double value() const;
-  void update(int taken_path_index);
 
-  double pheromones;
-  uint64_t weight;
-  int next_hop_index;
+  // -- public members ---------------------------------------------------------
 
-  double alpha = 1; // TODO: Let's think about that sometime
-  double beta = 1;
+  double pheromones_ = 0;
+  uint64_t weight_ = 0;
+  int next_hop_index_ = -1;
 
-  double pheromone_evaporation;
-  double pheromone_deposition = 1;
+  double alpha_ = 1; // TODO: Let's think about that sometime
+  double beta_ = 1;
+
+  double pheromone_evaporation_ = 0.01;
+  double pheromone_deposition_ = 1;
 };
 
 } // namespace routing
@@ -37,7 +51,7 @@ namespace std {
 template <>
 struct hash<::routing::entry> {
   std::size_t operator()(const ::routing::entry& e) const noexcept {
-    return std::hash<int>{}(e.next_hop_index);
+    return std::hash<int>{}(e.next_hop_index_);
   }
 };
 

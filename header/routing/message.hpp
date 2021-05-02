@@ -21,13 +21,13 @@ struct message {
 
   // -- members ----------------------------------------------------------------
 
-  const std::string& content();
+  const std::string& content() const;
 
   const int destination() const;
 
   const int source() const;
 
-  uint64_t last_weight();
+  uint64_t last_weight() const;
 
   const std::vector<int>& path() const;
 
@@ -36,6 +36,10 @@ struct message {
   void update_path(int current_hop);
 
   void update_weight(uint64_t weight);
+
+  bool path_contains(int node_id) const;
+
+  // -- CAF inspection function ------------------------------------------------
 
   template <class Inspector>
   friend bool inspect(Inspector& f, routing::message& x) {

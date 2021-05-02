@@ -36,8 +36,8 @@ behavior message_generator(stateful_actor<message_generator_state>* self,
       }
       milliseconds waitTime(state.randWaitTime(state.gen));
       self->delayed_send(self, waitTime, generate_message_atom_v);
-      aout(self) << "[Message Generator]: Next Message in " << waitTime
-                 << std::endl;
+      // aout(self) << "[Message Generator]: Next Message in " << waitTime
+      //            << std::endl;
     },
     [=](remove_node_atom, const actor& node) {
       aout(self) << "[Message Generator]: removing Node" << std::endl;
