@@ -1,8 +1,5 @@
 #include "actors/topology_manager.hpp"
 
-#include <boost/graph/graphviz.hpp>
-#include <sstream>
-
 #include "actors/node.hpp"
 #include "actors/transition.hpp"
 #include "caf/actor_ostream.hpp"
@@ -16,51 +13,43 @@ using namespace caf;
 
 namespace actors {
 
-behavior topology_manager_actor(stateful_actor<topology_manager_state>* self,
-                                actor message_generator) {
-  self->state.initialized_transitions = 0;
-
+behavior topology_manager(stateful_actor<topology_manager_state>* self,
+                          actor message_generator) {
   return {
     [=](generate_atom, size_t num_nodes, size_t num_transitions, int seed) {
-      auto graph = graph::generate_random_graph(num_nodes, num_transitions,
-                                                seed);
-
-      self->state.graph = graph;
-      std::ofstream graph_log;
-      graph_log.open("graph.log");
-
-      boost::write_graphviz(graph_log, graph);
-      graph_log.close();
+      self->state.graph = graph::generate_random_graph(num_nodes,
+                                                       num_transitions, seed);
+      auto& g = self->state.graph;
+      graph::log_graph(g);
       aout(self) << "[topo] Generated graph. Written to graph.log."
                  << std::endl;
-
       aout(self) << "[topo] Adding nodes" << std::endl;
-      for (int node : graph::get_verteces(graph)) {
+      for (const auto& node : graph::get_verteces(g)) {
         auto node_ref = self->spawn(node_actor, node, seed, self);
-        self->state.nodes[node] = node_ref;
         self->send(message_generator, add_node_atom_v, node_ref);
+        self->state.nodes.emplace(node, std::move(node_ref));
       }
-
       aout(self) << "[topo] Adding transitions" << std::endl;
-      for (auto const& edge : graph::get_edges(graph)) {
-        auto [first, second, weight] = edge;
-        auto node_one = self->state.nodes[first];
-        auto node_two = self->state.nodes[second];
-        self->state.transitions[std::make_pair(first, second)] = self->spawn(
-          transition_actor, node_one, first, node_two, second, self, 10);
+      for (const auto& e : graph::get_edges(g)) {
+        auto node_one = std::make_pair(self->state.nodes.at(e.node_1),
+                                       e.node_1);
+        auto node_two = std::make_pair(self->state.nodes.at(e.node_2),
+                                       e.node_2);
+        self->state.transitions.emplace(std::make_pair(e.node_1, e.node_2),
+                                        self->spawn(transition_actor, node_one,
+                                                    node_two, self, 10));
       }
-
       aout(self) << "[topo] Finished building graph with "
-                 << graph::num_edges(graph) << " edges and "
-                 << graph::num_verteces(graph) << " verteces." << std::endl;
+                 << graph::num_edges(g) << " edges and "
+                 << graph::num_verteces(g) << " verteces." << std::endl;
     },
     [=](done_atom) {
       auto& state = self->state;
-      state.initialized_transitions++;
-      if (state.initialized_transitions >= graph::num_edges(state.graph)) {
+      if (++state.initialized_transitions >= graph::num_edges(state.graph))
         aout(self) << "[topo] Transitions initialized" << std::endl;
-      }
-    }};
+      // TODO: Should notify the message generator here
+    },
+  };
 }
 
 } // namespace actors

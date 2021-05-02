@@ -4,24 +4,38 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/operators.hpp>
-#include <iostream>
+#include <unordered_set>
 #include <utility>
+#include <vector>
+
+#include "graph/edge.hpp"
 
 namespace graph {
 
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, boost::no_property, boost::property<boost::edge_weight_t, int>>
-  Graph;
-typedef std::tuple<int, int, int> Edge;
+// -- type declarations --------------------------------------------------------
 
-typedef int Vertex;
+using vertex = int;
+using undirected_graph
+  = boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS,
+                          boost::no_property,
+                          boost::property<boost::edge_weight_t, int>>;
+using vertex_list = std::vector<vertex>;
+using edge_list = std::vector<edge>;
 
-Graph generate_random_graph(size_t num_verticies, size_t num_edges, int seed);
+// -- Public API ---------------------------------------------------------------
 
-std::vector<Vertex> get_verteces(Graph graph);
+undirected_graph generate_random_graph(size_t num_verticies, size_t num_edges,
+                                       int seed);
 
-std::vector<Edge> get_edges(Graph graph);
+vertex_list get_verteces(const undirected_graph& g);
 
-int num_verteces(Graph graph);
+edge_list get_edges(const undirected_graph& g);
 
-int num_edges(Graph graph);
+size_t num_verteces(const undirected_graph& g);
+
+size_t num_edges(const undirected_graph& g);
+
+void log_graph(const undirected_graph& g,
+               const std::string& path = "graph.log");
+
 } // namespace graph

@@ -6,23 +6,25 @@
 
 #pragma once
 
+#include <map>
+
 #include "caf/behavior.hpp"
 #include "caf/stateful_actor.hpp"
 #include "graph/generator.hpp"
 
 namespace actors {
 
-using EdgeIndex = std::pair<int, int>;
+using edge_index = std::pair<int, int>;
 
 struct topology_manager_state {
-  std::map<EdgeIndex, caf::actor> transitions;
+  std::map<edge_index, caf::actor> transitions;
   std::map<int, caf::actor> nodes;
   size_t initialized_transitions = 0;
-  graph::Graph graph;
+  graph::undirected_graph graph;
 };
 
 caf::behavior
-topology_manager_actor(caf::stateful_actor<topology_manager_state>* self,
-                       caf::actor message_generator);
+topology_manager(caf::stateful_actor<topology_manager_state>* self,
+                 caf::actor message_generator);
 
 } // namespace actors

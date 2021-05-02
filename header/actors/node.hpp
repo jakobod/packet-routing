@@ -9,6 +9,7 @@
 #include <random>
 
 #include "caf/behavior.hpp"
+#include "caf/event_based_actor.hpp"
 #include "caf/stateful_actor.hpp"
 
 namespace actors {
@@ -18,8 +19,6 @@ struct node_state {
   std::mt19937 generator;
   uint64_t current_load = 1;
   int node_index = -1;
-
-  void print(caf::stateful_actor<node_state>* actor_stuff, std::string msg);
 };
 
 caf::behavior node_actor(caf::stateful_actor<node_state>* self, int index,

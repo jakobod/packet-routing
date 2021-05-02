@@ -56,6 +56,7 @@ set(SRC_FILES
   src/actors/node.cpp
   src/actors/topology_manager.cpp
   src/actors/transition.cpp
+  src/graph/edge.cpp
   src/graph/generator.cpp
   src/routing/message.cpp
   src/routing/table.cpp
