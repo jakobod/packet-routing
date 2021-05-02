@@ -7,12 +7,6 @@
 #include "caf/fwd.hpp"
 #include "routing/message.hpp"
 #include "type_ids.hpp"
-<<<<<<< HEAD
-#include <random>
-#include <vector>
-#include <string>
-=======
->>>>>>> 5132555dbc03f02b605b46623efd98258945558d
 
 using namespace caf;
 
@@ -33,32 +27,6 @@ behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed,
                                      }),
                       end(transitions));
   });
-<<<<<<< HEAD
-  return {[=](register_transition_atom, actor trans) {
-            self->state.print(self, "Got new transition " + to_string(trans));
-            self->state.transitions.push_back(trans);
-            self->monitor(trans);
-            return done_atom_v;
-          },
-          [=](message_atom, routing::message& msg) {
-            if (msg.destination() == self) {
-              self->state.print(self, "Got message: " + msg.content());
-              aout(self) << "[node] Hops: " << msg.path() << std::endl;
-            } else {
-              //self->state.print(self, "Forwarding message: " + msg.content()
-              //                          + " Path lenght: "
-              //                          + std::to_string(msg.path_length()));
-              msg.update_path(self->state.node_index);
-              msg.update_weight(self->state.current_load);
-
-              std::uniform_int_distribution<> distrib(
-                0, self->state.transitions.size() - 1);
-              auto& trans
-                = self->state.transitions.at(distrib(self->state.generator));
-              self->send(trans, message_atom_v, std::move(msg));
-            }
-          }};
-=======
   return {
     [=](register_transition_atom, actor trans) {
       aout(self) << "[node " << node_index << "]: Got new transition " << trans
@@ -68,16 +36,15 @@ behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed,
       return done_atom_v;
     },
     [=](message_atom, routing::message& msg) {
-      if (msg.destination() == self) {
+      if (msg.destination() == self->state.node_index) {
         aout(self) << "[node " << node_index
                    << "]: Got message: " << msg.content() << msg.path()
                    << std::endl;
       } else {
         aout(self) << "[node " << node_index
                    << "]: Forwarding message: " + msg.content()
-                   << ", Path lenght: " << msg.path_length();
-        msg.update_path(self);
-        msg.update_weight(self->state.current_load);
+                   << ", Last weight: " << msg.last_weight() << std::endl;
+        msg.update_path(self->state.node_index);
         std::uniform_int_distribution<> distrib(
           0, self->state.transitions.size() - 1);
         auto& trans
@@ -86,7 +53,6 @@ behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed,
       }
     },
   };
->>>>>>> 5132555dbc03f02b605b46623efd98258945558d
 }
 
 } // namespace actors

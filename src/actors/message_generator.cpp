@@ -28,7 +28,7 @@ behavior message_generator(stateful_actor<message_generator_state>* self,
         std::uniform_int_distribution<> randNode(0, state.nodes.size() - 1);
         size_t receiveIndex = randNode(state.gen);
         size_t sendIndex = randNode(state.gen);
-        routing::message msg("Hello", state.nodes[receiveIndex]);
+        routing::message msg("Hello", receiveIndex, sendIndex);
         self->send(state.nodes[sendIndex], message_atom_v, msg);
         aout(self) << "[Message Generator]: Generating new message from "
                    << sendIndex << " to " << receiveIndex << " out of "

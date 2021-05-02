@@ -15,7 +15,7 @@ namespace routing {
 
 /// A message that can be routed through the network of nodes.
 struct message {
-  message(std::string content, caf::actor destination);
+  message(std::string content, int destination, int source);
 
   message() = default;
 
@@ -23,11 +23,13 @@ struct message {
 
   const std::string& content();
 
-  const caf::actor& destination() const;
+  const int destination() const;
 
-  uint64_t path_length();
+  const int source() const;
 
-  const std::vector<int>& path();
+  uint64_t last_weight();
+
+  const std::vector<int>& path() const;
 
   // -- public-API -------------------------------------------------------------
 
@@ -39,15 +41,17 @@ struct message {
   friend bool inspect(Inspector& f, routing::message& x) {
     return f.object(x).fields(f.field("content", x.content_),
                               f.field("destination", x.destination_),
+                              f.field("source", x.source_),
                               f.field("path", x.path_),
-                              f.field("path_length", x.path_length_));
+                              f.field("last_weight", x.last_weight_));
   }
 
 private:
   std::string content_ = "";
-  caf::actor destination_;
+  int destination_;
+  int source_;
   std::vector<int> path_;
-  uint64_t path_length_ = 0;
+  uint64_t last_weight_ = 0;
 };
 
 } // namespace routing

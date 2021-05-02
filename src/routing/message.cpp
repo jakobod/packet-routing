@@ -16,10 +16,10 @@ using namespace caf;
 
 namespace routing {
 
-message::message(std::string content, actor destination)
+message::message(std::string content, int destination, int source)
   : content_(std::move(content)),
     destination_(std::move(destination)),
-    path_length_(0) {
+    last_weight_(0) {
   // nop
 }
 
@@ -29,15 +29,19 @@ const std::string& message::content() {
   return content_;
 }
 
-const caf::actor& message::destination() const {
+const int message::destination() const {
   return destination_;
 }
 
-uint64_t message::path_length() {
-  return path_length_;
+const int message::source() const {
+  return source_;
 }
 
-const std::vector<int>& message::path() {
+uint64_t message::last_weight() {
+  return last_weight_;
+}
+
+const std::vector<int>& message::path() const {
   return path_;
 }
 
@@ -48,7 +52,7 @@ void message::update_path(int current_hop) {
 }
 
 void message::update_weight(uint64_t weight) {
-  path_length_ += weight;
+  last_weight_ = weight;
 }
 
 } // namespace routing

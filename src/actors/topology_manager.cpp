@@ -37,7 +37,7 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
                                        e.node_2);
         self->state.transitions.emplace(std::make_pair(e.node_1, e.node_2),
                                         self->spawn(transition_actor, node_one,
-                                                    node_two, self, 10));
+                                                    node_two, self, e.weight));
       }
       aout(self) << "[topo] Finished building graph with "
                  << graph::num_edges(g) << " edges and "

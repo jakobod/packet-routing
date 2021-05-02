@@ -60,6 +60,7 @@ set(SRC_FILES
   src/graph/generator.cpp
   src/routing/message.cpp
   src/routing/table.cpp
+  src/routing/entry.cpp
 )
 
 # -- add executables -----------------------------------------------------------
