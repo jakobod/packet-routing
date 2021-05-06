@@ -47,6 +47,6 @@ struct node_state {
 };
 
 caf::behavior node_actor(caf::stateful_actor<node_state>* self, int index,
-                         int seed, caf::actor parent);
+                         int seed, caf::actor listener, caf::actor parent);
 
 } // namespace actors

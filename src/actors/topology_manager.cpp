@@ -14,7 +14,7 @@ using namespace caf;
 namespace actors {
 
 behavior topology_manager(stateful_actor<topology_manager_state>* self,
-                          actor message_generator) {
+                          actor message_generator, actor listener) {
   return {
     [=](generate_atom, size_t num_nodes, size_t num_transitions, int seed) {
       self->state.graph = graph::generate_random_graph(num_nodes,
@@ -25,7 +25,7 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
                  << std::endl;
       aout(self) << "[topo] Adding nodes" << std::endl;
       for (const auto& node : graph::get_verteces(g)) {
-        auto node_ref = self->spawn(node_actor, node, seed, self);
+        auto node_ref = self->spawn(node_actor, node, seed, listener, self);
         self->send(message_generator, add_node_atom_v, node_ref);
         self->state.nodes.emplace(node, std::move(node_ref));
       }
@@ -37,7 +37,7 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
                                        e.node_2);
         self->state.transitions.emplace(std::make_pair(e.node_1, e.node_2),
                                         self->spawn(transition_actor, node_one,
-                                                    node_two, self, e.weight));
+                                                    node_two, self, e.weight, listener));
       }
       aout(self) << "[topo] Finished building graph with "
                  << graph::num_edges(g) << " edges and "

@@ -8,6 +8,7 @@
 
 #include "actors/message_generator.hpp"
 #include "actors/topology_manager.hpp"
+#include "benchmark/benchmarker.hpp"
 
 #include "type_ids.hpp"
 
@@ -32,7 +33,8 @@ struct config : actor_system_config {
 void caf_main(actor_system& sys, const config& args) {
   scoped_actor self{sys};
   auto mg = sys.spawn(actors::message_generator, 5000, args.seed);
-  auto tm = sys.spawn(actors::topology_manager, mg);
+  auto bm = sys.spawn(benchmark::benchmarker, args.seed);
+  auto tm = sys.spawn(actors::topology_manager, mg, bm);
   self->send(tm, generate_atom_v, args.num_nodes, args.num_transitions,
              args.seed);
   std::string dummy;

@@ -5,7 +5,6 @@
  */
 
 #include "routing/message.hpp"
-
 #include "caf/actor_ostream.hpp"
 #include "caf/event_based_actor.hpp"
 #include "caf/fwd.hpp"
@@ -13,14 +12,14 @@
 #include "type_ids.hpp"
 
 using namespace caf;
-
+using namespace std::chrono;
 namespace routing {
 
 message::message(std::string content, int destination, int source)
   : content_(std::move(content)),
     destination_(std::move(destination)),
+    time_created_(duration_cast<milliseconds>(steady_clock::now().time_since_epoch())),
     last_weight_(0) {
-  // nop
 }
 
 // -- members ----------------------------------------------------------------
@@ -43,6 +42,10 @@ uint64_t message::last_weight() const {
 
 const std::vector<int>& message::path() const {
   return path_;
+}
+
+const std::chrono::milliseconds message::time_created() const {
+  return time_created_;
 }
 
 // -- public-API -------------------------------------------------------------

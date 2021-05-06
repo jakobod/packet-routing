@@ -61,6 +61,7 @@ set(SRC_FILES
   src/routing/message.cpp
   src/routing/table.cpp
   src/routing/entry.cpp
+  src/benchmark/benchmarker.cpp
 )
 
 # -- add executables -----------------------------------------------------------

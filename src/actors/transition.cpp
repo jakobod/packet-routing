@@ -13,7 +13,7 @@ namespace actors {
 
 behavior transition_actor(caf::stateful_actor<transition_state>* self,
                           node_pair node_1, node_pair node_2, caf::actor parent,
-                          int weight) {
+                          int weight, caf::actor listener) {
   self->link_to(parent);
   self->state.index = std::make_pair(node_1.second, node_2.second);
   self->send(node_1.first, register_transition_atom_v, self, node_2.second);

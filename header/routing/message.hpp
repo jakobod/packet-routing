@@ -8,7 +8,7 @@
 
 #include <string>
 #include <vector>
-
+#include <chrono>
 #include "caf/actor.hpp"
 
 namespace routing {
@@ -31,6 +31,8 @@ struct message {
 
   const std::vector<int>& path() const;
 
+  const std::chrono::milliseconds time_created() const;
+
   // -- public-API -------------------------------------------------------------
 
   void update_path(int current_hop);
@@ -48,6 +50,7 @@ struct message {
                               f.field("source", x.source_),
                               f.field("path", x.path_),
                               f.field("last_weight", x.last_weight_));
+                              f.field("time_created", x.time_created_);
   }
 
 private:
@@ -56,6 +59,7 @@ private:
   int source_;
   std::vector<int> path_;
   uint64_t last_weight_ = 0;
+  std::chrono::milliseconds time_created_;
 };
 
 } // namespace routing

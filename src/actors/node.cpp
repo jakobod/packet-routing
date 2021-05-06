@@ -12,7 +12,7 @@ using namespace caf;
 
 namespace actors {
 
-behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed,
+behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed, actor listener,
                     actor parent) {
   self->state.generator = std::mt19937(seed);
   self->state.node_index = node_index;
@@ -43,9 +43,7 @@ behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed,
     [=](message_atom, routing::message& msg) {
       self->state.routing_table.update(msg);
       if (msg.destination() == self->state.node_index) {
-        aout(self) << "[node " << node_index
-                   << "]: Got message: " << msg.content() << msg.path()
-                   << std::endl;
+        self->send(listener, message_delivered_atom_v, std::move(msg));
       } else {
         aout(self) << "[node " << node_index
                    << "]: Forwarding message: " + msg.content()
