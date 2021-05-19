@@ -23,9 +23,9 @@ behavior transition_actor(caf::stateful_actor<transition_state>* self,
     [=](message_atom, routing::message& msg) {
       msg.update_weight(self->state.weight);
       if (self->current_sender() == node_1.first)
-        self->send(node_2.first, message_atom_v, std::move(msg));
+        self->delayed_send(node_2.first, std::chrono::milliseconds(self->state.weight), message_atom_v, std::move(msg));
       else
-        self->send(node_1.first, message_atom_v, std::move(msg));
+        self->delayed_send(node_1.first, std::chrono::milliseconds(self->state.weight) ,message_atom_v, std::move(msg));
     },
     [=](done_atom) {
       if (++self->state.received_dones == 2)

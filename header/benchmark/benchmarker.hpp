@@ -9,6 +9,8 @@
 #include <cstdint>
 #include <random>
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 #include "routing/message.hpp"
 #include "caf/actor.hpp"
@@ -18,6 +20,7 @@
 namespace benchmark {
 
 struct benchmarker_state {
+    std::ofstream csvFile;
 };
 
 caf::behavior
