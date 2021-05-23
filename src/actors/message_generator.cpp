@@ -19,9 +19,6 @@ behavior message_generator(stateful_actor<message_generator_state>* self,
   self->state.gen = std::mt19937(seed);
   self->state.randWaitTime = std::uniform_int_distribution<>(0,
                                                              maxWaitTime - 1);
-  self->delayed_send(self,
-                     milliseconds(self->state.randWaitTime(self->state.gen)),
-                     generate_message_atom_v);
   return {
     [=](generate_message_atom) {
       if (++self->state.num_messages > num_messages) {

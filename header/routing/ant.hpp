@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "routing/policy.hpp"
+
 #include <random>
 #include <unordered_map>
 #include <vector>
@@ -18,23 +20,22 @@
 namespace routing {
 
 /// A routing table for routing packets using the ant-routing approach
-class table {
+class ant : public policy {
   using entry_list = std::vector<entry>;
   using routing_map = std::unordered_map<int, entry_list>;
 
 public:
-  table();
-  ~table();
+  ant();
+  ~ant() override;
 
-  void init(int seed, hyperparameters params);
+  void init(int seed, hyperparameters params) override;
 
-  void update(const message& msg);
-  void delete_route(int node_id);
-  int get_route(int dest);
+  void update(const message& msg) override;
+  void delete_route(int node_id) override;
+  int get_route(int dest) override;
 
 private:
   routing_map routes;
-  std::mt19937 gen;
   hyperparameters params_;
 };
 

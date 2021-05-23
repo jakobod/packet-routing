@@ -22,7 +22,8 @@ def plot(input, output, title):
   plt.xlabel('Message number [#]')
   plt.ylabel('Duration [ms]')
 
-  plt.savefig(output, bbox_inches='tight', transparent=True)
+  # plt.savefig(output, bbox_inches='tight', transparent=True)
+  plt.show()
 
 
 def main():

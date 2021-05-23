@@ -1,31 +1,32 @@
 /**
  * @author Jakob Otto
  * @email jakob.otto@haw-hamburg.de
- * @file table.cpp
+ * @file ant.cpp
  */
 
-#include "routing/table.hpp"
-#include "routing/message.hpp"
 #include <iostream>
+
+#include "routing/ant.hpp"
+#include "routing/message.hpp"
 
 using namespace caf;
 
 namespace routing {
 
-table::table() {
+ant::ant() {
   // nop
 }
 
-table::~table() {
+ant::~ant() {
   // nop
 }
 
-void table::init(int seed, routing::hyperparameters params) {
-  gen.seed(seed);
+void ant::init(int seed, routing::hyperparameters params) {
+  this->gen.seed(seed);
   params_ = params;
 }
 
-void table::update(const message& msg) {
+void ant::update(const message& msg) {
   // Update every goal in the hop list
   for (const auto& index : msg.path()) {
     auto [it, success] = routes.emplace(index, entry_list());
@@ -47,7 +48,7 @@ void table::update(const message& msg) {
   }
 }
 
-void table::delete_route(int node_id) {
+void ant::delete_route(int node_id) {
   for (auto map_it = routes.begin(); map_it != routes.end(); ++map_it) {
     for (auto list_it = map_it->second.begin(); list_it != map_it->second.end();
          ++list_it) {
@@ -59,7 +60,7 @@ void table::delete_route(int node_id) {
   }
 }
 
-int table::get_route(int dest) {
+int ant::get_route(int dest) {
   double sum_of_values;
   auto it = routes.find(dest);
   if (it != routes.end()) {
@@ -67,7 +68,7 @@ int table::get_route(int dest) {
     for (const auto& item : entry_l)
       sum_of_values += item.value();
     std::uniform_real_distribution<> random(0, sum_of_values);
-    auto randomValue = random(gen);
+    auto randomValue = random(this->gen);
     for (const auto& e : entry_l) {
       if (randomValue < e.value())
         return e.next_hop_index_;

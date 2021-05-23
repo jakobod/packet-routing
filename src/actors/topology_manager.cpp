@@ -15,7 +15,7 @@ namespace actors {
 
 behavior topology_manager(stateful_actor<topology_manager_state>* self,
                           actor message_generator, actor listener,
-                          routing::hyperparameters params) {
+                          routing::hyperparameters params, bool random) {
   self->set_exit_handler([=](const exit_msg&) { self->quit(); });
   self->link_to(listener);
   return {
@@ -29,7 +29,7 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
       aout(self) << "[topo] Adding nodes" << std::endl;
       for (const auto& node : graph::get_verteces(g)) {
         auto node_ref = self->spawn(node_actor, node, seed, listener, self,
-                                    params);
+                                    params, random);
         self->send(message_generator, add_node_atom_v, node_ref);
         self->state.nodes.emplace(node, std::move(node_ref));
       }
@@ -50,9 +50,10 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
     },
     [=](done_atom) {
       auto& state = self->state;
-      if (++state.initialized_transitions >= graph::num_edges(state.graph))
+      if (++state.initialized_transitions >= graph::num_edges(state.graph)) {
         aout(self) << "[topo] Transitions initialized" << std::endl;
-      // TODO: Should notify the message generator here
+        self->send(message_generator, generate_message_atom_v);
+      }
     },
   };
 }

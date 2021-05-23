@@ -58,9 +58,10 @@ set(SRC_FILES
   src/actors/transition.cpp
   src/graph/edge.cpp
   src/graph/generator.cpp
+  src/routing/ant.cpp
   src/routing/message.cpp
-  src/routing/table.cpp
   src/routing/entry.cpp
+  src/routing/random.cpp
   src/benchmark/benchmarker.cpp
 )
 
