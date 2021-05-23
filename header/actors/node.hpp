@@ -11,6 +11,7 @@
 #include "caf/behavior.hpp"
 #include "caf/event_based_actor.hpp"
 #include "caf/stateful_actor.hpp"
+#include "routing/hyperparameters.hpp"
 #include "routing/table.hpp"
 
 namespace actors {
@@ -47,6 +48,7 @@ struct node_state {
 };
 
 caf::behavior node_actor(caf::stateful_actor<node_state>* self, int index,
-                         int seed, caf::actor listener, caf::actor parent);
+                         int seed, caf::actor listener, caf::actor parent,
+                         routing::hyperparameters params);
 
 } // namespace actors

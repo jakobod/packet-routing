@@ -1,10 +1,17 @@
 #include "routing/entry.hpp"
 
+#include <iostream>
+
 namespace routing {
 
 // -- Constructors -------------------------------------------------------------
 
-entry::entry(int next_hop_index) : next_hop_index_(next_hop_index) {
+entry::entry(int next_hop_index, hyperparameters params)
+  : next_hop_index_(next_hop_index),
+    alpha_(params.alpha),
+    beta_(params.beta),
+    pheromone_evaporation_(params.pheromone_evaporation),
+    pheromone_deposition_(params.pheromone_deposition) {
   // nop
 }
 

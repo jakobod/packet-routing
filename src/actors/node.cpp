@@ -12,11 +12,12 @@ using namespace caf;
 
 namespace actors {
 
-behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed, actor listener,
-                    actor parent) {
+behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed,
+                    actor listener, actor parent,
+                    routing::hyperparameters params) {
   self->state.generator = std::mt19937(seed);
   self->state.node_index = node_index;
-  self->state.routing_table.init(seed);
+  self->state.routing_table.init(seed, params);
   self->link_to(parent);
   self->set_down_handler([=](const down_msg& msg) {
     aout(self) << "[node " << node_index << "]: transition " << msg.source

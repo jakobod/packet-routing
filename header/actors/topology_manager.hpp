@@ -11,6 +11,7 @@
 #include "caf/behavior.hpp"
 #include "caf/stateful_actor.hpp"
 #include "graph/generator.hpp"
+#include "routing/hyperparameters.hpp"
 
 namespace actors {
 
@@ -25,6 +26,7 @@ struct topology_manager_state {
 
 caf::behavior
 topology_manager(caf::stateful_actor<topology_manager_state>* self,
-                 caf::actor message_generator, caf::actor listener);
+                 caf::actor message_generator, caf::actor listener,
+                 routing::hyperparameters params);
 
 } // namespace actors

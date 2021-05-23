@@ -12,6 +12,7 @@
 
 #include "caf/actor.hpp"
 #include "routing/entry.hpp"
+#include "routing/hyperparameters.hpp"
 #include "routing/message.hpp"
 
 namespace routing {
@@ -25,7 +26,7 @@ public:
   table();
   ~table();
 
-  void init(int seed);
+  void init(int seed, hyperparameters params);
 
   void update(const message& msg);
   void delete_route(int node_id);
@@ -34,6 +35,7 @@ public:
 private:
   routing_map routes;
   std::mt19937 gen;
+  hyperparameters params_;
 };
 
 } // namespace routing

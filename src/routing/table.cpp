@@ -6,6 +6,7 @@
 
 #include "routing/table.hpp"
 #include "routing/message.hpp"
+#include <iostream>
 
 using namespace caf;
 
@@ -19,15 +20,10 @@ table::~table() {
   // nop
 }
 
-void table::init(int seed) {
+void table::init(int seed, routing::hyperparameters params) {
   gen.seed(seed);
+  params_ = params;
 }
-
-/*
-  1,4,7,5,2
-  1: 3,2,8
-  4 -> gains pheromones
-*/
 
 void table::update(const message& msg) {
   // Update every goal in the hop list
@@ -44,7 +40,7 @@ void table::update(const message& msg) {
         to_update != entry_l.end()) {
       to_update->update(msg.last_weight());
     } else {
-      routing::entry e{msg.path().back()};
+      routing::entry e{msg.path().back(), params_};
       e.update(msg.last_weight());
       entry_l.emplace_back(std::move(e));
     }

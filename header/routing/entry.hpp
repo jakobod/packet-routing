@@ -6,17 +6,18 @@
 
 #pragma once
 
+#include <cmath>
 #include <cstdint>
 
 #include "caf/actor.hpp"
-#include <cmath>
+#include "routing/hyperparameters.hpp"
 
 namespace routing {
 
 struct entry {
   // -- Constructors -----------------------------------------------------------
 
-  entry(int next_hop_index);
+  entry(int next_hop_index, hyperparameters params);
 
   // -- public API -------------------------------------------------------------
 
