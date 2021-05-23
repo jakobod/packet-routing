@@ -16,6 +16,8 @@ namespace actors {
 behavior topology_manager(stateful_actor<topology_manager_state>* self,
                           actor message_generator, actor listener,
                           routing::hyperparameters params) {
+  self->set_exit_handler([=](const exit_msg&) { self->quit(); });
+  self->link_to(listener);
   return {
     [=](generate_atom, size_t num_nodes, size_t num_transitions, int seed) {
       self->state.graph = graph::generate_random_graph(num_nodes,

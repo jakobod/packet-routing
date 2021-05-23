@@ -21,6 +21,7 @@ struct config : actor_system_config {
   config() {
     init_global_meta_objects<id_block::packet_routing>();
     opt_group{custom_options_, "global"}
+      .add(num_messages, "messages,m", "number of messages to route")
       .add(num_nodes, "num-nodes,n", "number of nodes")
       .add(num_transitions, "num-transitions,t", "number of transitions")
       .add(seed, "seed,s", "seed for graph and message generation")
@@ -32,6 +33,8 @@ struct config : actor_system_config {
       .add(beta, "beta,b", "Controls the influence of the path weight");
   }
 
+  // Benchmark
+  size_t num_messages = 1000;
   // Graph generation
   size_t num_nodes = 1;
   size_t num_transitions = 1;
@@ -45,16 +48,15 @@ struct config : actor_system_config {
 
 void caf_main(actor_system& sys, const config& args) {
   scoped_actor self{sys};
-  auto mg = sys.spawn(actors::message_generator, 100, args.seed);
-  auto bm = sys.spawn(benchmark::benchmarker, args.seed);
+  auto mg = sys.spawn(actors::message_generator, 100, args.seed,
+                      args.num_messages);
+  auto bm = sys.spawn(benchmark::benchmarker, args.seed, args.num_messages);
   auto tm = sys.spawn(actors::topology_manager, mg, bm,
                       routing::hyperparameters{args.pheromone_deposition,
                                                args.pheromone_evaporation,
                                                args.alpha, args.beta});
   self->send(tm, generate_atom_v, args.num_nodes, args.num_transitions,
              args.seed);
-  std::string dummy;
-  std::getline(std::cin, dummy);
 }
 
 } // namespace

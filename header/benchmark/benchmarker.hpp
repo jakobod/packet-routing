@@ -7,23 +7,24 @@
 #pragma once
 
 #include <cstdint>
+#include <fstream>
+#include <iostream>
 #include <random>
 #include <vector>
-#include <iostream>
-#include <fstream>
 
-#include "routing/message.hpp"
 #include "caf/actor.hpp"
 #include "caf/behavior.hpp"
 #include "caf/stateful_actor.hpp"
+#include "routing/message.hpp"
 
 namespace benchmark {
 
 struct benchmarker_state {
-    std::ofstream csvFile;
+  std::ofstream csvFile;
+  size_t delivered_messages = 0;
 };
 
-caf::behavior
-benchmarker(caf::stateful_actor<benchmarker_state>* self, size_t seed);
+caf::behavior benchmarker(caf::stateful_actor<benchmarker_state>* self,
+                          size_t seed, size_t num_messages);
 
-} // namespace actors
+} // namespace benchmark
