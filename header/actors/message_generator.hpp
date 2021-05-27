@@ -1,7 +1,7 @@
 /**
  * @author Jakob Otto
  * @email jakob.otto@haw-hamburg.de
- * @file type_ids.hpp
+ * @file message_generator.hpp
  */
 
 #pragma once

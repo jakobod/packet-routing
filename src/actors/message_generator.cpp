@@ -23,32 +23,25 @@ behavior message_generator(stateful_actor<message_generator_state>* self,
     [=](generate_message_atom) {
       if (++self->state.num_messages > num_messages) {
         self->quit();
-        return;
+      } else {
+        auto& state = self->state;
+        if (self->state.nodes.size() >= 2) {
+          std::uniform_int_distribution<> randNode(0, state.nodes.size() - 1);
+          size_t receiveIndex = randNode(state.gen);
+          size_t sendIndex = randNode(state.gen);
+          routing::message msg("Hello", receiveIndex, sendIndex);
+          self->send(state.nodes.at(sendIndex), message_atom_v, msg);
+        }
+        milliseconds waitTime(state.randWaitTime(state.gen));
+        self->delayed_send(self, waitTime, generate_message_atom_v);
       }
-      auto& state = self->state;
-      if (self->state.nodes.size() >= 2) {
-        std::uniform_int_distribution<> randNode(0, state.nodes.size() - 1);
-        size_t receiveIndex = randNode(state.gen);
-        size_t sendIndex = randNode(state.gen);
-        routing::message msg("Hello", receiveIndex, sendIndex);
-        self->send(state.nodes[sendIndex], message_atom_v, msg);
-        // aout(self) << "[Message Generator]: Generating new message from "
-        //            << sendIndex << " to " << receiveIndex << " out of "
-        //            << state.nodes.size() << " Nodes" << std::endl;
-      }
-      milliseconds waitTime(state.randWaitTime(state.gen));
-      self->delayed_send(self, waitTime, generate_message_atom_v);
-      // aout(self) << "[Message Generator]: Next Message in " << waitTime
-      //            << std::endl;
     },
     [=](remove_node_atom, const actor& node) {
-      aout(self) << "[Message Generator]: removing Node" << std::endl;
       self->state.nodes.erase(std::remove(self->state.nodes.begin(),
                                           self->state.nodes.end(), node),
                               self->state.nodes.end());
     },
     [=](add_node_atom, const actor& node) {
-      aout(self) << "[Message Generator]: adding Node" << std::endl;
       self->state.nodes.push_back(node);
     },
   };

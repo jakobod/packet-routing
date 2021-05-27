@@ -1,3 +1,9 @@
+/**
+ * @author Henri Burau
+ * @email henri.burau@haw-hamburg.de
+ * @file topology_manager.cpp
+ */
+
 #include "actors/topology_manager.hpp"
 
 #include "actors/node.hpp"
@@ -18,6 +24,7 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
                           routing::hyperparameters params, bool random) {
   self->set_exit_handler([=](const exit_msg&) { self->quit(); });
   self->link_to(listener);
+
   return {
     [=](generate_atom, size_t num_nodes, size_t num_transitions, int seed) {
       self->state.graph = graph::generate_random_graph(num_nodes,

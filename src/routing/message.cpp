@@ -15,11 +15,12 @@ using namespace caf;
 using namespace std::chrono;
 namespace routing {
 
-message::message(std::string content, int destination, int source)
+message::message(std::string content, int destination, int)
   : content_(std::move(content)),
     destination_(std::move(destination)),
-    time_created_(duration_cast<milliseconds>(steady_clock::now().time_since_epoch())),
-    last_weight_(0) {
+    last_weight_(0),
+    time_created_(
+      duration_cast<milliseconds>(steady_clock::now().time_since_epoch())) {
 }
 
 // -- members ----------------------------------------------------------------
@@ -28,11 +29,11 @@ const std::string& message::content() const {
   return content_;
 }
 
-const int message::destination() const {
+int message::destination() const {
   return destination_;
 }
 
-const int message::source() const {
+int message::source() const {
   return source_;
 }
 

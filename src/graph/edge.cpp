@@ -19,7 +19,7 @@ bool edge::operator==(const edge& other) const {
 }
 
 bool edge::operator!=(const edge& other) const {
-  return *this != other;
+  return !(*this == other);
 }
 
 } // namespace graph

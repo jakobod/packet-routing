@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <iostream>
 #include <random>
 
 #include "routing/hyperparameters.hpp"
@@ -16,14 +17,24 @@ namespace routing {
 /// An interface for a routing table.
 class policy {
 public:
-  policy() = default;
   virtual ~policy() = default;
 
-  virtual void init(int seed, hyperparameters params) = 0;
+  virtual void init(int, hyperparameters) {
+    std::cerr << "init not implemented" << std::endl;
+  }
 
-  virtual void update(const message& msg) = 0;
-  virtual void delete_route(int node_id) = 0;
-  virtual int get_route(int dest) = 0;
+  virtual void update(const message&) {
+    std::cerr << "update not implemented" << std::endl;
+  }
+
+  virtual void delete_route(int) {
+    std::cerr << "delete_route not implemented" << std::endl;
+  }
+
+  virtual int get_route(int) {
+    std::cerr << "get_route not implemented" << std::endl;
+    return -1;
+  }
 
 protected:
   std::mt19937 gen;

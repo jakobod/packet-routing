@@ -30,9 +30,6 @@ undirected_graph generate_random_graph(size_t num_verticies, size_t num_edges,
 }
 
 vertex_list get_verteces(const undirected_graph& g) {
-  using index_map = property_map<undirected_graph, vertex_index_t>::type;
-  using vertex_iter = graph_traits<undirected_graph>::vertex_iterator;
-  using vertex_iter_pair = std::pair<vertex_iter, vertex_iter>;
   auto index = boost::get(vertex_index, g);
   vertex_list result;
   for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)

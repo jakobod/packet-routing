@@ -25,7 +25,6 @@ class ant : public policy {
   using routing_map = std::unordered_map<int, entry_list>;
 
 public:
-  ant();
   ~ant() override;
 
   void init(int seed, hyperparameters params) override;

@@ -1,7 +1,7 @@
 /**
- * @author Jakob Otto
- * @email jakob.otto@haw-hamburg.de
- * @file type_ids.hpp
+ * @author Henri Burau
+ * @email henri.burau@haw-hamburg.de
+ * @file topology_manager.hpp
  */
 
 #pragma once

@@ -1,3 +1,9 @@
+/**
+ * @author Maximilian Mang
+ * @email maximilian.mang@haw-hamburg.de
+ * @file benchmarker.cpp
+ */
+
 #include "benchmark/benchmarker.hpp"
 
 #include <random>
@@ -12,7 +18,7 @@ using namespace std::chrono;
 
 namespace benchmark {
 
-behavior benchmarker(stateful_actor<benchmarker_state>* self, size_t seed,
+behavior benchmarker(stateful_actor<benchmarker_state>* self, size_t,
                      size_t num_messages, std::string output) {
   self->set_default_handler(drop);
   self->state.csvFile.open(output);

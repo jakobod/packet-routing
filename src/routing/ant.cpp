@@ -13,10 +13,6 @@ using namespace caf;
 
 namespace routing {
 
-ant::ant() {
-  // nop
-}
-
 ant::~ant() {
   // nop
 }
@@ -48,7 +44,7 @@ void ant::update(const message& msg) {
   }
 }
 
-void ant::delete_route(int node_id) {
+void ant::delete_route(int) {
   for (auto map_it = routes.begin(); map_it != routes.end(); ++map_it) {
     for (auto list_it = map_it->second.begin(); list_it != map_it->second.end();
          ++list_it) {
@@ -61,7 +57,7 @@ void ant::delete_route(int node_id) {
 }
 
 int ant::get_route(int dest) {
-  double sum_of_values;
+  double sum_of_values = 0.0;
   auto it = routes.find(dest);
   if (it != routes.end()) {
     auto& entry_l = it->second;

@@ -15,13 +15,14 @@ using node_pair = std::pair<caf::actor, int>;
 using EdgeIndex = std::pair<int, int>;
 
 struct transition_state {
-  uint64_t weight;
+  uint64_t weight = 0;
   EdgeIndex index;
   size_t received_dones = 0;
 };
 
 caf::behavior transition_actor(caf::stateful_actor<transition_state>* self,
                                node_pair node_1, node_pair node_2,
-                               caf::actor parent, int weight, caf::actor listener);
+                               caf::actor parent, int weight,
+                               caf::actor listener);
 
 } // namespace actors

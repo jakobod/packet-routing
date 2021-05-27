@@ -6,8 +6,6 @@
 
 #include "routing/random.hpp"
 
-using namespace caf;
-
 namespace routing {
 
 random::random() {
@@ -18,19 +16,19 @@ random::~random() {
   // nop
 }
 
-void random::init(int seed, routing::hyperparameters params) {
+void random::init(int, hyperparameters) {
   // nop
 }
 
-void random::update(const message& msg) {
+void random::update(const message&) {
   // nop
 }
 
-void random::delete_route(int node_id) {
+void random::delete_route(int) {
   // nop
 }
 
-int random::get_route(int dest) {
+int random::get_route(int) {
   return -1;
 }
 

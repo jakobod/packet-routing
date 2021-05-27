@@ -38,7 +38,7 @@ struct config : actor_system_config {
   // Benchmark
   size_t num_messages = 1000;
   bool random = false;
-  std::string output;
+  std::string output = "results.csv";
   // Graph generation
   size_t num_nodes = 1;
   size_t num_transitions = 1;

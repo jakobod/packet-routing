@@ -6,10 +6,10 @@
 
 #pragma once
 
+#include "caf/actor.hpp"
+#include <chrono>
 #include <string>
 #include <vector>
-#include <chrono>
-#include "caf/actor.hpp"
 
 namespace routing {
 
@@ -23,9 +23,9 @@ struct message {
 
   const std::string& content() const;
 
-  const int destination() const;
+  int destination() const;
 
-  const int source() const;
+  int source() const;
 
   uint64_t last_weight() const;
 
@@ -50,7 +50,7 @@ struct message {
                               f.field("source", x.source_),
                               f.field("path", x.path_),
                               f.field("last_weight", x.last_weight_));
-                              f.field("time_created", x.time_created_);
+    f.field("time_created", x.time_created_);
   }
 
 private:
