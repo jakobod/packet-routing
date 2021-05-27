@@ -23,6 +23,7 @@ struct config : actor_system_config {
     opt_group{custom_options_, "global"}
       .add(num_messages, "messages,m", "number of messages to route")
       .add(random, "random,r", "Route randomly")
+      .add(output, "output,o", "The output name of the resulting csv")
       .add(num_nodes, "num-nodes,n", "number of nodes")
       .add(num_transitions, "num-transitions,t", "number of transitions")
       .add(seed, "seed,s", "seed for graph and message generation")
@@ -37,6 +38,7 @@ struct config : actor_system_config {
   // Benchmark
   size_t num_messages = 1000;
   bool random = false;
+  std::string output;
   // Graph generation
   size_t num_nodes = 1;
   size_t num_transitions = 1;
@@ -52,7 +54,8 @@ void caf_main(actor_system& sys, const config& args) {
   scoped_actor self{sys};
   auto mg = sys.spawn(actors::message_generator, 100, args.seed,
                       args.num_messages);
-  auto bm = sys.spawn(benchmark::benchmarker, args.seed, args.num_messages);
+  auto bm = sys.spawn(benchmark::benchmarker, args.seed, args.num_messages,
+                      args.output);
   auto tm = sys.spawn(actors::topology_manager, mg, bm,
                       routing::hyperparameters{args.pheromone_deposition,
                                                args.pheromone_evaporation,

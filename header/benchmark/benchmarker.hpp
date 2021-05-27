@@ -25,6 +25,6 @@ struct benchmarker_state {
 };
 
 caf::behavior benchmarker(caf::stateful_actor<benchmarker_state>* self,
-                          size_t seed, size_t num_messages);
+                          size_t seed, size_t num_messages, std::string output);
 
 } // namespace benchmark

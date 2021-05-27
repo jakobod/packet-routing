@@ -12,31 +12,55 @@ def movingaverage(interval, window_size):
   return np.convolve(interval, window, 'same')
 
 
-def plot(input, output, title):
+def save_or_show(output):
+  if output:
+    plt.savefig(output, bbox_inches='tight', transparent=True)
+  else:
+    plt.show()
+
+
+def plot_single(input, output, title):
   df = pd.read_csv(input)
   df.plot()
-  y_av = movingaverage(df[' duration'], 50)
+  y_av = movingaverage(df['duration'], 50)
   plt.plot(range(0, len(df)), y_av, color='r', linestyle='-')
 
   plt.title(title)
   plt.xlabel('Message number [#]')
   plt.ylabel('Duration [ms]')
 
-  # plt.savefig(output, bbox_inches='tight', transparent=True)
-  plt.show()
+  save_or_show(output)
+
+
+def plot_multiple(inputs, output, title, windowsize=50):
+  fig, ax = plt.subplots()
+  for input in inputs:
+    df = pd.read_csv(input)
+    y_av = movingaverage(df['duration'], windowsize)
+    ax.plot(range(0, len(df)), y_av, linestyle='-', label=input)
+
+  ax.legend()
+  plt.title(title)
+  plt.xlabel('Message number [#]')
+  plt.ylabel('Duration [ms]')
+  save_or_show(output)
 
 
 def main():
   parser = argparse.ArgumentParser()
+  parser.add_argument('-n', '--names-list', )
+  parser.add_argument('--input', '-i', help='The input path',
+                      nargs='+', default=[], metavar='INPUT')
   parser.add_argument(
-      'input', help='The input path', metavar='INPUT')
+      '--output', '-o', help='The output path', metavar='OUTPUT')
   parser.add_argument(
-      'output', help='The output path', metavar='OUTPUT')
-  parser.add_argument(
-      'title', help='The title of the plot', metavar='TITLE')
+      '--title', '-t', help='The title of the plot', metavar='TITLE')
 
   args = parser.parse_args()
-  plot(args.input, args.output, args.title)
+  if len(args.input) == 1:
+    plot_single(args.input[0], args.output, args.title)
+  else:
+    plot_multiple(args.input, args.output, args.title)
 
 
 if __name__ == '__main__':
