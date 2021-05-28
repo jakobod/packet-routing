@@ -52,7 +52,7 @@ struct config : actor_system_config {
 
 void caf_main(actor_system& sys, const config& args) {
   scoped_actor self{sys};
-  auto mg = sys.spawn(actors::message_generator, 100, args.seed,
+  auto mg = sys.spawn(actors::message_generator, 10, args.seed,
                       args.num_messages);
   auto bm = sys.spawn(benchmark::benchmarker, args.seed, args.num_messages,
                       args.output);
