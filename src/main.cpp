@@ -32,13 +32,15 @@ struct config : actor_system_config {
       .add(pheromone_evaporation, "evaporation,e",
            "Evaporation coefficient of pheromones")
       .add(alpha, "alpha,a", "Controls the influence of the pheromones")
-      .add(beta, "beta,b", "Controls the influence of the path weight");
+      .add(beta, "beta,b", "Controls the influence of the path weight")
+      .add(log_graph, "log,l", "Writes the generated graph to a file");
   }
 
   // Benchmark
   size_t num_messages = 1000;
   bool random = false;
   std::string output = "results.csv";
+  bool log_graph = false;
   // Graph generation
   size_t num_nodes = 1;
   size_t num_transitions = 1;
@@ -60,7 +62,7 @@ void caf_main(actor_system& sys, const config& args) {
                       routing::hyperparameters{args.pheromone_deposition,
                                                args.pheromone_evaporation,
                                                args.alpha, args.beta},
-                      args.random);
+                      args.random, args.log_graph);
   self->send(tm, generate_atom_v, args.num_nodes, args.num_transitions,
              args.seed);
 }

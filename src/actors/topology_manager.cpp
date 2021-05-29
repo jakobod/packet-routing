@@ -21,7 +21,8 @@ namespace actors {
 
 behavior topology_manager(stateful_actor<topology_manager_state>* self,
                           actor message_generator, actor listener,
-                          routing::hyperparameters params, bool random) {
+                          routing::hyperparameters params, bool random,
+                          bool log_graph) {
   self->set_exit_handler([=](const exit_msg&) { self->quit(); });
   self->link_to(listener);
 
@@ -30,7 +31,8 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
       self->state.graph = graph::generate_random_graph(num_nodes,
                                                        num_transitions, seed);
       auto& g = self->state.graph;
-      graph::log_graph(g);
+      if (log_graph)
+        graph::log_graph(g);
       aout(self) << "[topo] Generated graph. Written to graph.log."
                  << std::endl;
       aout(self) << "[topo] Adding nodes" << std::endl;

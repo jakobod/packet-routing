@@ -16,13 +16,15 @@ struct fixture {
 
 } // namespace
 
-CAF_TEST_FIXTURE_SCOPE(ip_tests, fixture)
+CAF_TEST_FIXTURE_SCOPE(generator_tests, fixture)
 
 CAF_TEST(Graph Test) {
   auto g = graph::generate_random_graph(10, 18, 0);
   graph::log_graph(g);
   auto verteces = graph::get_verteces(g);
+  auto edges = graph::get_edges(g);
   CAF_CHECK_EQUAL(size_t(10), verteces.size());
+  CAF_CHECK_EQUAL(size_t(18), edges.size());
 }
 
 CAF_TEST_FIXTURE_SCOPE_END()
