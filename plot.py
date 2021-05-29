@@ -20,10 +20,11 @@ def save_or_show(output):
 
 
 def plot_single(input, output, title):
+  print('plotting single')
   df = pd.read_csv(input)
-  df.plot()
+  df.plot(y='duration')
   y_av = movingaverage(df['duration'], 50)
-  plt.plot(range(0, len(df)), y_av, color='r', linestyle='-')
+  plt.plot(y_av, color='r', linestyle='-')
 
   plt.title(title)
   plt.xlabel('Message number [#]')
@@ -33,11 +34,12 @@ def plot_single(input, output, title):
 
 
 def plot_multiple(inputs, output, title, windowsize=50):
+  print('plotting multiple')
   fig, ax = plt.subplots()
   for input in inputs:
     df = pd.read_csv(input)
     y_av = movingaverage(df['duration'], windowsize)
-    ax.plot(range(0, len(df)), y_av, linestyle='-', label=input)
+    ax.plot(y_av, linestyle='-', label=input)
 
   ax.legend()
   plt.title(title)
