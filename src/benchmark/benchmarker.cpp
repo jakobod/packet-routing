@@ -21,22 +21,20 @@ namespace benchmark {
 behavior benchmarker(stateful_actor<benchmarker_state>* self, size_t,
                      size_t num_messages, std::string output) {
   self->set_default_handler(drop);
-  self->state.csvFile.open(output);
-  self->state.csvFile << "content,path,duration" << std::endl;
+  self->state.results.resize(num_messages);
   return {
     [=](message_delivered_atom, routing::message& msg) {
       auto diff = steady_clock::now().time_since_epoch() - msg.time_created();
-      auto timePassed = duration_cast<milliseconds>(diff);
-      std::ostringstream formattedPath;
-      if (!msg.path().empty()) {
-        std::copy(msg.path().begin(), msg.path().end() - 1,
-                  std::ostream_iterator<int>(formattedPath, " "));
-        formattedPath << !msg.path().back();
-      }
-      self->state.csvFile << msg.content() << "," << formattedPath.str() << ","
-                          << timePassed.count() << std::endl;
-      if (++self->state.delivered_messages >= num_messages)
+      auto duration = duration_cast<milliseconds>(diff);
+      std::cout << "adding msg.id() = " << msg.id()
+                << ", results.size() = " << self->state.results.size()
+                << std::endl;
+      self->state.results.at(msg.id()) = result{msg.id(), std::move(msg.path()),
+                                                duration};
+      if (++self->state.delivered_messages >= num_messages) {
+        self->state.save_to_file(output);
         self->quit();
+      }
     },
   };
 }

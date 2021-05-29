@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
@@ -19,9 +20,40 @@
 
 namespace benchmark {
 
+struct result {
+  result() = default;
+  result(size_t id, std::vector<int> path, std::chrono::milliseconds duration)
+    : msg_id(id), path(std::move(path)), duration(duration) {
+    // nop
+  }
+
+  friend std::ostream& operator<<(std::ostream& os, const result& x) {
+    std::ostringstream formattedPath;
+    if (!x.path.empty()) {
+      std::copy(x.path.begin(), x.path.end() - 1,
+                std::ostream_iterator<int>(formattedPath, " "));
+      formattedPath << !x.path.back();
+    }
+    return os << x.msg_id << "," << formattedPath.str() << ","
+              << x.duration.count();
+  }
+
+  size_t msg_id;
+  std::vector<int> path;
+  std::chrono::milliseconds duration;
+};
+
 struct benchmarker_state {
-  std::ofstream csvFile;
   size_t delivered_messages = 0;
+
+  std::vector<result> results;
+
+  void save_to_file(std::string output) {
+    std::ofstream os(output);
+    os << "content,path,duration" << std::endl;
+    for (const auto& res : results)
+      os << res << std::endl;
+  }
 };
 
 caf::behavior benchmarker(caf::stateful_actor<benchmarker_state>* self,

@@ -5,6 +5,7 @@
  */
 
 #include "routing/message.hpp"
+
 #include "caf/actor_ostream.hpp"
 #include "caf/event_based_actor.hpp"
 #include "caf/fwd.hpp"
@@ -15,8 +16,9 @@ using namespace caf;
 using namespace std::chrono;
 namespace routing {
 
-message::message(std::string content, int destination, int)
-  : content_(std::move(content)),
+message::message(size_t id, int source, int destination)
+  : id_(id),
+    source_(source),
     destination_(std::move(destination)),
     last_weight_(0),
     time_created_(
@@ -25,16 +27,16 @@ message::message(std::string content, int destination, int)
 
 // -- members ----------------------------------------------------------------
 
-const std::string& message::content() const {
-  return content_;
-}
-
-int message::destination() const {
-  return destination_;
+size_t message::id() const {
+  return id_;
 }
 
 int message::source() const {
   return source_;
+}
+
+int message::destination() const {
+  return destination_;
 }
 
 uint64_t message::last_weight() const {
