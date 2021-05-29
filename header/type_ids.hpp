@@ -30,7 +30,7 @@ CAF_BEGIN_TYPE_ID_BLOCK(packet_routing, caf::first_custom_type_id)
   CAF_ADD_ATOM(packet_routing, add_node_atom)
   CAF_ADD_ATOM(packet_routing, remove_node_atom)
 
-  //Listener Atoms
+  // Listener Atoms
   CAF_ADD_ATOM(packet_routing, message_delivered_atom)
   CAF_ADD_ATOM(packet_routing, message_forwarded_atom)
   CAF_ADD_ATOM(packet_routing, message_received_atom)

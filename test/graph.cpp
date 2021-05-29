@@ -1,4 +1,4 @@
-#define CAF_SUITE generator
+#define CAF_SUITE graph
 
 #include "caf/test/dsl.hpp"
 
@@ -16,7 +16,7 @@ struct fixture {
 
 } // namespace
 
-CAF_TEST_FIXTURE_SCOPE(generator_tests, fixture)
+CAF_TEST_FIXTURE_SCOPE(graph_tests, fixture)
 
 CAF_TEST(Graph Test) {
   auto g = graph::generate_random_graph(10, 18, 0);
