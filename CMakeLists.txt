@@ -32,27 +32,18 @@ FetchContent_Declare(
   GIT_TAG        master
 )
 FetchContent_Populate(actor_framework)
-foreach(varname CAF_ENABLE_EXAMPLES CAF_ENABLE_IO_MODULE CAF_ENABLE_TESTING
+foreach(varname CAF_ENABLE_EXAMPLES CAF_ENABLE_IO_MODULE
                 CAF_ENABLE_TOOLS CAF_ENABLE_OPENSSL_MODULE)
   set(${varname} OFF CACHE INTERNAL "")
 endforeach()
 set(CAF_SANITIZERS "${SANITIZERS}" CACHE INTERNAL "")
 add_subdirectory(${actor_framework_SOURCE_DIR} ${actor_framework_BINARY_DIR})
 
-# -- fetch actor-framework repo ------------------------------------------------
-
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
-)
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-
 # -- project files -------------------------------------------------------------
 
 # New source files have to be added here
-set(SRC_FILES
+set(
+  SRC_FILES
   src/actors/message_generator.cpp
   src/actors/node.cpp
   src/actors/topology_manager.cpp
@@ -83,24 +74,32 @@ endmacro()
 add_target(example) # This is the example project
 add_target(main) # This is the main project file
 
-# -- add test executables -------------------------------------------------------
+# -- test setup ----------------------------------------------------------------
 
 enable_testing()
+function(add_test_suites target)
+  foreach(suiteName ${ARGN})
+    string(REPLACE "." "/" suitePath ${suiteName})
+    target_sources(${target} PRIVATE
+      "${CMAKE_CURRENT_SOURCE_DIR}/test/${suitePath}.cpp")
+    add_test(NAME ${suiteName}
+             COMMAND ${target} -r300 -n -v5 -s"^${suiteName}$")
+  endforeach()
+endfunction()
 
-add_executable(
-  vas_test
-  "${SRC_FILES}"
-  test/generator.cpp
+add_executable(packet-routing-test 
+  "test/packet_routing_test.cpp"  
+  ${SRC_FILES})  
+target_link_libraries(packet-routing-test PRIVATE
+                      CAF::test
+                      CAF::core
+                      Boost::graph)
+target_include_directories(packet-routing-test PRIVATE
+                           "${CMAKE_CURRENT_SOURCE_DIR}/test"
+                           "${CMAKE_CURRENT_SOURCE_DIR}/header")
+
+set(TEST_SUITES
+  generator
 )
 
-target_include_directories(vas_test PRIVATE "header")
-
-target_link_libraries(
-  vas_test
-  gtest_main
-  CAF::core
-  Boost::graph
-)
-
-include(GoogleTest)
-gtest_discover_tests(vas_test)
+add_test_suites(packet-routing-test ${TEST_SUITES})
