@@ -20,9 +20,11 @@ namespace actors {
 struct node_state {
   std::vector<std::pair<caf::actor, int>> transitions;
   std::mt19937 generator;
-  uint64_t current_load = 1;
+  uint64_t current_load = 0;
   int node_index = -1;
   std::shared_ptr<routing::policy> routing_table;
+  uint64_t messages_visited = 0;
+  float load_weight;
 
   caf::actor from_index(int index) {
     if (auto it

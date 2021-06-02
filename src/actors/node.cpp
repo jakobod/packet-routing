@@ -19,6 +19,7 @@ behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed,
                     routing::hyperparameters params, bool random) {
   self->state.generator = std::mt19937(seed);
   self->state.node_index = node_index;
+  self->state.load_weight = params.load_weight;
   if (random)
     self->state.routing_table = std::make_shared<routing::random>();
   else
@@ -26,6 +27,7 @@ behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed,
   self->state.routing_table->init(seed, params);
   self->set_exit_handler([=](const exit_msg&) { self->quit(); });
   self->link_to(parent);
+  self->delayed_send(self, std::chrono::milliseconds(50), get_load_atom_v);
   self->set_down_handler([=](const down_msg& msg) {
     auto& transitions = self->state.transitions;
     auto node_id = self->state.from_act(msg.source);
@@ -44,18 +46,25 @@ behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed,
     },
     [=](message_atom, routing::message& msg) {
       self->state.routing_table->update(msg);
+      self->state.messages_visited++;
       if (msg.destination() == self->state.node_index) {
         self->send(listener, message_delivered_atom_v, std::move(msg));
       } else {
         msg.update_path(self->state.node_index);
         auto index = self->state.routing_table->get_route(msg.destination());
         if (index < 0 || msg.path_contains(index)) {
-          self->send(self->state.pick_random(), message_atom_v, std::move(msg));
+          self->delayed_send(self->state.pick_random(), std::chrono::milliseconds(self->state.current_load), message_atom_v, std::move(msg));
         } else {
           auto trans = self->state.from_index(index);
-          self->send(trans, message_atom_v, std::move(msg));
+          self->delayed_send(trans, std::chrono::milliseconds(self->state.current_load), message_atom_v, std::move(msg));
         }
       }
+    },
+    [=](get_load_atom) {
+      self->state.current_load = uint64_t(self->state.messages_visited * self->state.load_weight);
+      self->send(listener, share_load_atom_v, self->state.current_load, self->state.node_index);
+      self->state.messages_visited = 0;
+      self->delayed_send(self, std::chrono::milliseconds(100), get_load_atom_v);
     },
   };
 }

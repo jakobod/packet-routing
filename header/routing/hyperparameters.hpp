@@ -13,6 +13,7 @@ struct hyperparameters {
   double pheromone_evaporation = 0.5;
   double alpha = 1;
   double beta = 1;
+  float load_weight = 1;
 };
 
 } // namespace routing

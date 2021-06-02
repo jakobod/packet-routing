@@ -33,6 +33,7 @@ struct config : actor_system_config {
            "Evaporation coefficient of pheromones")
       .add(alpha, "alpha,a", "Controls the influence of the pheromones")
       .add(beta, "beta,b", "Controls the influence of the path weight")
+      .add(load_weight, "load_weight,w", "Controls Weight of load")
       .add(log_graph, "log,l", "Writes the generated graph to a file");
   }
 
@@ -50,6 +51,7 @@ struct config : actor_system_config {
   double pheromone_evaporation = 0.5;
   double alpha = 1;
   double beta = 1;
+  float load_weight = 1;
 };
 
 void caf_main(actor_system& sys, const config& args) {
@@ -61,7 +63,7 @@ void caf_main(actor_system& sys, const config& args) {
   auto tm = sys.spawn(actors::topology_manager, mg, bm,
                       routing::hyperparameters{args.pheromone_deposition,
                                                args.pheromone_evaporation,
-                                               args.alpha, args.beta},
+                                               args.alpha, args.beta, args.load_weight},
                       args.random, args.log_graph);
   self->send(tm, generate_atom_v, args.num_nodes, args.num_transitions,
              args.seed);

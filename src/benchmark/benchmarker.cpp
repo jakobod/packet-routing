@@ -22,6 +22,9 @@ behavior benchmarker(stateful_actor<benchmarker_state>* self, size_t,
                      size_t num_messages, std::string output) {
   self->set_default_handler(drop);
   self->state.results.resize(num_messages);
+  self->state.load_csv.open ("load.csv");
+  self->state.load_csv <<  "id, load" << std::endl;
+
   return {
     [=](message_delivered_atom, routing::message& msg) {
       auto now = steady_clock::now().time_since_epoch();
@@ -37,6 +40,9 @@ behavior benchmarker(stateful_actor<benchmarker_state>* self, size_t,
         self->state.save_to_file(output);
         self->quit();
       }
+    },
+    [=](share_load_atom, uint64_t current_load, int id) {
+      self->state.load_csv << id << "," << current_load << std::endl;
     },
   };
 }

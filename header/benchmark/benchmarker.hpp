@@ -55,7 +55,7 @@ struct result {
 struct benchmarker_state {
   size_t delivered_messages = 0;
   std::vector<result> results;
-
+  std::ofstream load_csv;
   void save_to_file(std::string output) {
     std::ofstream os(output);
     os << "content,time_created,time_received,path,duration" << std::endl;
