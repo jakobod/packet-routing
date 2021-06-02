@@ -22,8 +22,14 @@ namespace benchmark {
 
 struct result {
   result() = default;
-  result(size_t id, std::vector<int> path, std::chrono::milliseconds duration)
-    : msg_id(id), path(std::move(path)), duration(duration) {
+  result(size_t id, std::chrono::milliseconds time_created,
+         std::chrono::milliseconds time_received, std::vector<int> path,
+         std::chrono::milliseconds duration)
+    : msg_id(id),
+      time_created_(time_created),
+      time_received_(time_received),
+      path(std::move(path)),
+      duration(duration) {
     // nop
   }
 
@@ -34,23 +40,25 @@ struct result {
                 std::ostream_iterator<int>(formattedPath, " "));
       formattedPath << !x.path.back();
     }
-    return os << x.msg_id << "," << formattedPath.str() << ","
+    return os << x.msg_id << "," << x.time_created_.count() << ","
+              << x.time_received_.count() << "," << formattedPath.str() << ","
               << x.duration.count();
   }
 
   size_t msg_id;
+  std::chrono::milliseconds time_created_;
+  std::chrono::milliseconds time_received_;
   std::vector<int> path;
   std::chrono::milliseconds duration;
 };
 
 struct benchmarker_state {
   size_t delivered_messages = 0;
-
   std::vector<result> results;
 
   void save_to_file(std::string output) {
     std::ofstream os(output);
-    os << "content,path,duration" << std::endl;
+    os << "content,time_created,time_received,path,duration" << std::endl;
     for (const auto& res : results)
       os << res << std::endl;
   }

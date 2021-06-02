@@ -9,14 +9,10 @@ using namespace caf;
 
 namespace {
 
-struct fixture {
+struct fixture : test_coordinator_fixture<> {
   fixture() {
     // nop
   }
-
-  actor_system_config cfg;
-  actor_system sys{cfg};
-  scoped_actor self{sys};
 };
 
 } // namespace

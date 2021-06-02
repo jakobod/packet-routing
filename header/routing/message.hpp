@@ -31,7 +31,7 @@ struct message {
 
   const std::vector<int>& path() const;
 
-  const std::chrono::milliseconds time_created() const;
+  std::chrono::milliseconds time_created() const;
 
   // -- public-API -------------------------------------------------------------
 

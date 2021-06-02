@@ -23,7 +23,7 @@ def plot_single(input, output, title):
   print('plotting single')
   df = pd.read_csv(input)
   df.plot(y='duration')
-  y_av = movingaverage(df['duration'], 50)
+  y_av = movingaverage(df['duration'], 10)
   plt.plot(y_av, color='r', linestyle='-')
 
   plt.title(title)
@@ -48,18 +48,26 @@ def plot_multiple(inputs, output, title, windowsize=50):
   save_or_show(output)
 
 
+def evaluate(input):
+  df = pd.read_csv(input[0])
+  print(df)
+
+
 def main():
   parser = argparse.ArgumentParser()
-  parser.add_argument('-n', '--names-list', )
   parser.add_argument('--input', '-i', help='The input path',
                       nargs='+', default=[], metavar='INPUT')
   parser.add_argument(
       '--output', '-o', help='The output path', metavar='OUTPUT')
   parser.add_argument(
       '--title', '-t', help='The title of the plot', metavar='TITLE')
+  parser.add_argument(
+      '--evaluate', '-e', help='Evaluate the given csvs', action='store_true')
 
   args = parser.parse_args()
-  if len(args.input) == 1:
+  if args.evaluate:
+    evaluate(args.input)
+  elif len(args.input) == 1:
     plot_single(args.input[0], args.output, args.title)
   else:
     plot_multiple(args.input, args.output, args.title)

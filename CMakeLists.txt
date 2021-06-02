@@ -99,6 +99,7 @@ target_include_directories(packet-routing-test PRIVATE
                            "${CMAKE_CURRENT_SOURCE_DIR}/header")
 
 set(TEST_SUITES
+  transition
   graph
   message_generator
 )

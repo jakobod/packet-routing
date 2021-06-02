@@ -47,7 +47,7 @@ const std::vector<int>& message::path() const {
   return path_;
 }
 
-const std::chrono::milliseconds message::time_created() const {
+std::chrono::milliseconds message::time_created() const {
   return time_created_;
 }
 
