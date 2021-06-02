@@ -14,7 +14,7 @@ def movingaverage(interval, window_size):
 
 def save_or_show(output):
   if output:
-    plt.savefig(output, bbox_inches='tight', transparent=True)
+    plt.savefig(output, bbox_inches='tight', transparent=False)
   else:
     plt.show()
 
@@ -22,10 +22,17 @@ def save_or_show(output):
 def plot_single(input, output, title):
   print('plotting single')
   df = pd.read_csv(input)
-  df.plot(y='duration')
-  y_av = movingaverage(df['duration'], 10)
-  plt.plot(y_av, color='r', linestyle='-')
+  print(df)
+  df.plot(y='duration', zorder=1)
+  y_av = movingaverage(df['duration'], 100)
+  plt.plot(y_av, color='r', linestyle='-', zorder=2, label='moving average')
+  mean_duration = df['duration'].mean()
+  print(f'mean_duration={mean_duration}')
+  plt.hlines(mean_duration, xmin=0, xmax=len(
+      df), color='orange', zorder=3, label='mean runtime')
 
+  ax = plt.gca()
+  ax.legend()
   plt.title(title)
   plt.xlabel('Message number [#]')
   plt.ylabel('Duration [ms]')
@@ -33,12 +40,12 @@ def plot_single(input, output, title):
   save_or_show(output)
 
 
-def plot_multiple(inputs, output, title, windowsize=50):
+def plot_multiple(inputs, output, title):
   print('plotting multiple')
   fig, ax = plt.subplots()
   for input in inputs:
     df = pd.read_csv(input)
-    y_av = movingaverage(df['duration'], windowsize)
+    y_av = movingaverage(df['duration'], 100)
     ax.plot(y_av, linestyle='-', label=input)
 
   ax.legend()
@@ -48,9 +55,24 @@ def plot_multiple(inputs, output, title, windowsize=50):
   save_or_show(output)
 
 
-def evaluate(input):
-  df = pd.read_csv(input[0])
-  print(df)
+def throughput(inputs, output, title):
+  fig, ax = plt.subplots()
+  for input in inputs:
+    df = pd.read_csv(input)
+    print(df)
+    begin = df['time_created'][0]
+    end = df['time_received'][len(df['time_received'])-1]
+    print(f'begin = {begin}, end = {end}')
+    runtime = (end - begin) / 1000
+    throughput = len(df) / runtime
+    print(
+        f'runtime = {runtime}s, # messages = {len(df)}, throughput = {throughput}')
+    ax.bar(x=input, height=throughput, label=input)
+  plt.title(title)
+  plt.xticks(rotation=45)
+  plt.xlabel('Configuration')
+  plt.ylabel('Throughput [#/s]')
+  save_or_show(output)
 
 
 def main():
@@ -62,11 +84,11 @@ def main():
   parser.add_argument(
       '--title', '-t', help='The title of the plot', metavar='TITLE')
   parser.add_argument(
-      '--evaluate', '-e', help='Evaluate the given csvs', action='store_true')
+      '--throughput', help='Evaluate the throughput of the given csvs', action='store_true')
 
   args = parser.parse_args()
-  if args.evaluate:
-    evaluate(args.input)
+  if args.throughput:
+    throughput(args.input, args.output, args.title)
   elif len(args.input) == 1:
     plot_single(args.input[0], args.output, args.title)
   else:
