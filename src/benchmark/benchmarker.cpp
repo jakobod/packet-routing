@@ -22,16 +22,14 @@ behavior benchmarker(stateful_actor<benchmarker_state>* self, size_t,
                      size_t num_messages, std::string output) {
   self->set_default_handler(drop);
   self->state.results.resize(num_messages);
-  self->state.load_csv.open ("load.csv");
-  self->state.load_csv <<  "id, load" << std::endl;
 
   return {
-    [=](message_delivered_atom, routing::message& msg) {
+    [=](message_delivered_atom, routing::message& msg, bool successfull) {
       auto now = steady_clock::now().time_since_epoch();
       auto diff = now - msg.time_created();
       auto duration = duration_cast<milliseconds>(diff);
       std::cout << "adding msg.id() = " << msg.id()
-                << ", results.size() = " << self->state.results.size()
+                << ", successfull = " << (successfull ? "True" : "False")
                 << std::endl;
       self->state.results.at(msg.id())
         = result{msg.id(), msg.time_created(), duration_cast<milliseconds>(now),
@@ -42,7 +40,13 @@ behavior benchmarker(stateful_actor<benchmarker_state>* self, size_t,
       }
     },
     [=](share_load_atom, uint64_t current_load, int id) {
-      self->state.load_csv << id << "," << current_load << std::endl;
+      if (self->state.loads.find(id) == self->state.loads.end()) {
+        std::vector<int> loadList;
+        loadList.emplace_back(current_load);
+        self->state.loads[id] = std::move(loadList);
+      } else {
+        self->state.loads[id].push_back(current_load);
+      }
     },
   };
 }

@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <random>
+#include <string>
 #include <vector>
 
 #include "caf/actor.hpp"
@@ -55,12 +56,28 @@ struct result {
 struct benchmarker_state {
   size_t delivered_messages = 0;
   std::vector<result> results;
+  std::map<int, std::vector<int>> loads;
   std::ofstream load_csv;
   void save_to_file(std::string output) {
     std::ofstream os(output);
     os << "content,time_created,time_received,path,duration" << std::endl;
     for (const auto& res : results)
       os << res << std::endl;
+
+    std::ofstream load_os("load.csv");
+    load_os << "id";
+    for (size_t i = 0; i < loads[0].size(); ++i) {
+      load_os << "," << ("load_" + std::to_string(i));
+    }
+    load_os << std::endl;
+
+    for (const auto& load : loads) {
+      std::ostringstream formattedLoad;
+      std::copy(load.second.begin(), load.second.end() - 1,
+                std::ostream_iterator<int>(formattedLoad, ","));
+      formattedLoad << !load.second.back();
+      load_os << load.first << "," << formattedLoad.str() << std::endl;
+    }
   }
 };
 

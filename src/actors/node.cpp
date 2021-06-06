@@ -45,24 +45,38 @@ behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed,
       return done_atom_v;
     },
     [=](message_atom, routing::message& msg) {
-      self->state.routing_table->update(msg);
-      self->state.messages_visited++;
-      if (msg.destination() == self->state.node_index) {
-        self->send(listener, message_delivered_atom_v, std::move(msg));
+      auto& state = self->state;
+      state.routing_table->update(msg);
+      state.messages_visited++;
+      if (msg.destination() == state.node_index) {
+        self->send(listener, message_delivered_atom_v, std::move(msg), true);
       } else {
-        msg.update_path(self->state.node_index);
-        auto index = self->state.routing_table->get_route(msg.destination());
+        msg.update_path(state.node_index);
+        auto index = state.routing_table->get_route(msg.destination());
         if (index < 0 || msg.path_contains(index)) {
-          self->delayed_send(self->state.pick_random(), std::chrono::milliseconds(self->state.current_load), message_atom_v, std::move(msg));
+          std::shuffle(state.transitions.begin(), state.transitions.end(),
+                       state.generator);
+          for (auto& p : state.transitions) {
+            if (!msg.path_contains(p.second)) {
+              self->delayed_send(p.first,
+                                 std::chrono::milliseconds(state.current_load),
+                                 message_atom_v, std::move(msg));
+            }
+          }
+          self->send(listener, message_delivered_atom_v, std::move(msg), false);
         } else {
-          auto trans = self->state.from_index(index);
-          self->delayed_send(trans, std::chrono::milliseconds(self->state.current_load), message_atom_v, std::move(msg));
+          auto trans = state.from_index(index);
+          self->delayed_send(trans,
+                             std::chrono::milliseconds(state.current_load),
+                             message_atom_v, std::move(msg));
         }
       }
     },
     [=](get_load_atom) {
-      self->state.current_load = uint64_t(self->state.messages_visited * self->state.load_weight);
-      self->send(listener, share_load_atom_v, self->state.current_load, self->state.node_index);
+      self->state.current_load
+        = uint64_t(self->state.messages_visited * self->state.load_weight);
+      self->send(listener, share_load_atom_v, self->state.current_load,
+                 self->state.node_index);
       self->state.messages_visited = 0;
       self->delayed_send(self, std::chrono::milliseconds(100), get_load_atom_v);
     },
