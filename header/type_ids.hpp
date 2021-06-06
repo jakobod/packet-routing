@@ -33,6 +33,7 @@ CAF_BEGIN_TYPE_ID_BLOCK(packet_routing, caf::first_custom_type_id)
 
   // Listener Atoms
   CAF_ADD_ATOM(packet_routing, message_delivered_atom)
+  CAF_ADD_ATOM(packet_routing, message_dropped_atom)
   CAF_ADD_ATOM(packet_routing, message_forwarded_atom)
   CAF_ADD_ATOM(packet_routing, message_received_atom)
   CAF_ADD_ATOM(packet_routing, share_topology_atom)

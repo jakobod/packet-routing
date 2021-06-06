@@ -24,17 +24,19 @@ behavior benchmarker(stateful_actor<benchmarker_state>* self, size_t,
   self->state.results.resize(num_messages);
 
   return {
-    [=](message_delivered_atom, routing::message& msg, bool successfull) {
+    [=](message_delivered_atom, routing::message& msg, bool success) {
       auto now = steady_clock::now().time_since_epoch();
       auto diff = now - msg.time_created();
       auto duration = duration_cast<milliseconds>(diff);
-      std::cout << "adding msg.id() = " << msg.id()
-                << ", successfull = " << (successfull ? "True" : "False")
-                << std::endl;
+      // std::cout << "adding msg.id() = " << msg.id()
+      //           << ", success = " << (success ? "True" : "False") <<
+      //           std::endl;
       self->state.results.at(msg.id())
         = result{msg.id(), msg.time_created(), duration_cast<milliseconds>(now),
                  std::move(msg.path()), duration};
       if (++self->state.delivered_messages >= num_messages) {
+        aout(self) << "Got " << self->state.delivered_messages
+                   << " messages. QUITTING!" << std::endl;
         self->state.save_to_file(output);
         self->quit();
       }

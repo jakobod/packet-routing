@@ -45,30 +45,35 @@ behavior node_actor(stateful_actor<node_state>* self, int node_index, int seed,
       return done_atom_v;
     },
     [=](message_atom, routing::message& msg) {
-      auto& state = self->state;
-      state.routing_table->update(msg);
-      state.messages_visited++;
-      if (msg.destination() == state.node_index) {
+      self->state.routing_table->update(msg);
+      self->state.messages_visited++;
+      if (msg.destination() == self->state.node_index) {
         self->send(listener, message_delivered_atom_v, std::move(msg), true);
       } else {
-        msg.update_path(state.node_index);
-        auto index = state.routing_table->get_route(msg.destination());
+        msg.update_path(self->state.node_index);
+        auto index = self->state.routing_table->get_route(msg.destination());
         if (index < 0 || msg.path_contains(index)) {
-          std::shuffle(state.transitions.begin(), state.transitions.end(),
-                       state.generator);
-          for (auto& p : state.transitions) {
-            if (!msg.path_contains(p.second)) {
-              self->delayed_send(p.first,
-                                 std::chrono::milliseconds(state.current_load),
-                                 message_atom_v, std::move(msg));
+          std::shuffle(self->state.transitions.begin(),
+                       self->state.transitions.end(), self->state.generator);
+          bool sent_message = false;
+          for (auto& p : self->state.transitions) {
+            if (!msg.path_contains(p.second)
+                && p.second != self->state.node_index) {
+              sent_message = true;
+              self->delayed_send(
+                p.first, std::chrono::milliseconds(self->state.current_load),
+                message_atom_v, std::move(msg));
+              break;
             }
           }
-          self->send(listener, message_delivered_atom_v, std::move(msg), false);
+          if (!sent_message)
+            self->send(listener, message_delivered_atom_v, std::move(msg),
+                       false);
         } else {
-          auto trans = state.from_index(index);
-          self->delayed_send(trans,
-                             std::chrono::milliseconds(state.current_load),
-                             message_atom_v, std::move(msg));
+          auto trans = self->state.from_index(index);
+          self->delayed_send(
+            trans, std::chrono::milliseconds(self->state.current_load),
+            message_atom_v, std::move(msg));
         }
       }
     },
