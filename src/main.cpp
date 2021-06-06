@@ -23,7 +23,6 @@ struct config : actor_system_config {
     opt_group{custom_options_, "global"}
       .add(num_messages, "messages,m", "number of messages to route")
       .add(random, "random,r", "Route randomly")
-      .add(output, "output,o", "The output name of the resulting csv")
       .add(num_nodes, "num-nodes,n", "number of nodes")
       .add(num_transitions, "num-transitions,t", "number of transitions")
       .add(seed, "seed,s", "seed for graph and message generation")
@@ -33,15 +32,19 @@ struct config : actor_system_config {
            "Evaporation coefficient of pheromones")
       .add(alpha, "alpha,a", "Controls the influence of the pheromones")
       .add(beta, "beta,b", "Controls the influence of the path weight")
-      .add(load_weight, "load_weight,w", "Controls Weight of load")
-      .add(log_graph, "log,l", "Writes the generated graph to a file");
+      .add(load_weight, "load_weight,l", "Controls Weight of load");
+
+    opt_group{custom_options_, "logging"}
+      .add(message_log_path, "message-log-path",
+           "The output path of the resulting message log csv")
+      .add(load_log_path, "load-log-path",
+           "The output path of the resulting load log csv")
+      .add(log_graph, "log,l", "Write the generated graph to graph.log");
   }
 
   // Benchmark
   size_t num_messages = 1000;
   bool random = false;
-  std::string output = "results.csv";
-  bool log_graph = false;
   // Graph generation
   size_t num_nodes = 1;
   size_t num_transitions = 1;
@@ -52,19 +55,25 @@ struct config : actor_system_config {
   double alpha = 1;
   double beta = 1;
   float load_weight = 1;
+  // logging
+  std::string message_log_path = "message-log.csv";
+  std::string load_log_path = "load-log.csv";
+  bool log_graph = false;
 };
 
 void caf_main(actor_system& sys, const config& args) {
   scoped_actor self{sys};
   auto mg = sys.spawn(actors::message_generator, 10, args.seed,
                       args.num_messages);
-  auto bm = sys.spawn(benchmark::benchmarker, args.seed, args.num_messages,
-                      args.output);
-  auto tm = sys.spawn(actors::topology_manager, mg, bm,
-                      routing::hyperparameters{args.pheromone_deposition,
-                                               args.pheromone_evaporation,
-                                               args.alpha, args.beta, args.load_weight},
-                      args.random, args.log_graph);
+  auto bm = sys.spawn(benchmark::benchmarker, args.seed, args.num_nodes,
+                      args.num_messages, args.message_log_path,
+                      args.load_log_path);
+  auto tm
+    = sys.spawn(actors::topology_manager, mg, bm,
+                routing::hyperparameters{args.pheromone_deposition,
+                                         args.pheromone_evaporation, args.alpha,
+                                         args.beta, args.load_weight},
+                args.random, args.log_graph);
   self->send(tm, generate_atom_v, args.num_nodes, args.num_transitions,
              args.seed);
 }
