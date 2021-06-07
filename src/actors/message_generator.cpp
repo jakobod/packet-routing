@@ -14,10 +14,9 @@ using namespace std::chrono;
 namespace actors {
 
 behavior message_generator(stateful_actor<message_generator_state>* self,
-                           size_t maxWaitTime, size_t seed,
+                           size_t waitTime, size_t seed,
                            size_t num_messages) {
   self->state.gen = std::mt19937(seed);
-  self->state.randWaitTime = std::uniform_int_distribution<>(0, maxWaitTime);
   return {
     [=](generate_message_atom) {
       auto& state = self->state;
@@ -28,8 +27,7 @@ behavior message_generator(stateful_actor<message_generator_state>* self,
         routing::message msg(self->state.num_messages, source, destination);
         self->send(state.nodes.at(source), message_atom_v, msg);
       }
-      milliseconds waitTime(state.randWaitTime(state.gen));
-      self->delayed_send(self, waitTime, generate_message_atom_v);
+      self->delayed_send(self, milliseconds(waitTime), generate_message_atom_v);
       if (++self->state.num_messages >= num_messages)
         self->quit();
     },
