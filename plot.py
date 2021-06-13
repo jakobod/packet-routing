@@ -75,6 +75,25 @@ def throughput(inputs, output, title):
   save_or_show(output)
 
 
+def plot_success(inputs, output, title, window=100):
+  for input in inputs:
+    df = pd.read_csv(input)
+    print(df)
+    counts = df.rolling(window=window).success.sum()
+    print(counts)
+    counts = counts.divide(window)
+    counts = counts.multiply(100)
+    counts.plot(label=input)
+  ax = plt.gca()
+  ax.set_ylim([0, 105])
+  if len(inputs) > 1:
+    ax.legend()
+  plt.title(title)
+  plt.xlabel('Message number [#]')
+  plt.ylabel('Success Rate per 100 messages[%/100 msg]')
+  save_or_show(output)
+
+
 def main():
   parser = argparse.ArgumentParser()
   parser.add_argument('--input', '-i', help='The input path',
@@ -84,15 +103,18 @@ def main():
   parser.add_argument(
       '--title', '-t', help='The title of the plot', metavar='TITLE')
   parser.add_argument(
-      '--throughput', help='Evaluate the throughput of the given csvs', action='store_true')
+      '--mode', '-m', help='The mode in which to run the script', default='plot')
 
   args = parser.parse_args()
-  if args.throughput:
+  if args.mode == 'success':
+    plot_success(args.input, args.output, args.title)
+  elif args.mode == 'throughput':
     throughput(args.input, args.output, args.title)
-  elif len(args.input) == 1:
-    plot_single(args.input[0], args.output, args.title)
-  else:
-    plot_multiple(args.input, args.output, args.title)
+  elif args.mode == 'plot':
+    if len(args.input) == 1:
+      plot_single(args.input[0], args.output, args.title)
+    else:
+      plot_multiple(args.input, args.output, args.title)
 
 
 if __name__ == '__main__':
