@@ -1,4 +1,2 @@
-# Packet-routing
-
-# TODO
-[ ] Find some better namespaces to group the individual things
+# packet-routing
+A packet-routing simulation using the ant-routing algorithm
