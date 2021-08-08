@@ -101,4 +101,8 @@ add_test_suites(${tst_bin_target}
                 actors.node
                 actors.topology_manager
                 actors.transition
-                graph.generator)
+                graph.generator
+                routing.ant
+                routing.entry
+                routing.message
+                routing.random)

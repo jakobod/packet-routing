@@ -55,7 +55,7 @@ id_type ant::get_route(id_type destination) {
   auto it = routes.find(destination);
   if (it != routes.end()) {
     auto& entries = it->second;
-    auto sum = std::accumulate(entries.begin(), entries.end(), 0);
+    auto sum = std::accumulate(entries.begin(), entries.end(), 0.0);
     std::uniform_real_distribution<> random(0, sum);
     auto randomValue = random(this->gen);
     for (const auto& e : entries) {

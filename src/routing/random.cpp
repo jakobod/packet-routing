@@ -6,6 +6,8 @@
 
 #include "routing/random.hpp"
 
+#include <limits>
+
 namespace routing {
 
 void random::init(seed_type, hyperparameters) {
@@ -21,7 +23,7 @@ void random::delete_route(id_type) {
 }
 
 id_type random::get_route(id_type) {
-  return -1;
+  return std::numeric_limits<id_type>::max();
 }
 
 } // namespace routing

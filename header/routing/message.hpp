@@ -21,19 +21,19 @@ struct message {
 
   // -- members ----------------------------------------------------------------
 
-  [[nodiscard]] id_type id() const;
+  id_type id() const;
 
-  [[nodiscard]] id_type source() const;
+  id_type source() const;
 
-  [[nodiscard]] id_type destination() const;
+  id_type destination() const;
 
-  [[nodiscard]] weight_type last_weight() const;
+  weight_type last_weight() const;
 
-  [[nodiscard]] std::vector<id_type>& path();
+  std::vector<id_type>& path();
 
-  [[nodiscard]] const std::vector<id_type>& path() const;
+  const std::vector<id_type>& path() const;
 
-  [[nodiscard]] std::chrono::milliseconds time_created() const;
+  std::chrono::milliseconds time_created() const;
 
   // -- public-API -------------------------------------------------------------
 
@@ -41,7 +41,7 @@ struct message {
 
   void update_weight(weight_type weight);
 
-  [[nodiscard]] bool path_contains(id_type nid) const;
+  bool path_contains(id_type nid) const;
 
   // -- CAF inspection function ------------------------------------------------
 

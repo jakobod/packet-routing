@@ -20,7 +20,7 @@ struct entry {
 
   // -- public API -------------------------------------------------------------
 
-  [[nodiscard]] double value() const;
+  double value() const;
 
   void update(weight_type weight);
 
@@ -35,6 +35,7 @@ struct entry {
   operator double() const {
     return value();
   }
+
   // -- public members ---------------------------------------------------------
 
   double pheromones = 0;
