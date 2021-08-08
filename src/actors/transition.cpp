@@ -20,6 +20,7 @@ behavior transition_actor(caf::stateful_actor<transition_state>* self,
   self->send(node_1.first, register_transition_atom_v, self, node_2.second);
   self->send(node_2.first, register_transition_atom_v, self, node_1.second);
   self->state.weight = weight;
+
   return {
     [=](message_atom, routing::message& msg) {
       msg.update_weight(self->state.weight);

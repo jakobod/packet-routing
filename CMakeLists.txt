@@ -97,6 +97,8 @@ target_link_libraries(${tst_bin_target} PRIVATE
 target_include_directories(${tst_bin_target} PRIVATE
                            "${CMAKE_CURRENT_SOURCE_DIR}/header")
 add_test_suites(${tst_bin_target}
-                transition
-                graph
-                message_generator)
+                actors.message_generator
+                actors.node
+                actors.topology_manager
+                actors.transition
+                graph.generator)
