@@ -14,19 +14,20 @@
 #include "caf/stateful_actor.hpp"
 #include "routing/hyperparameters.hpp"
 #include "routing/policy.hpp"
+#include "types.hpp"
 
 namespace actors {
 
 struct node_state {
-  std::vector<std::pair<caf::actor, int>> transitions;
+  id_type node_id = -1;
+  size_t message_count = 0;
+  load_type current_load = 0;
+  double load_weight = 0.0;
   std::mt19937 generator;
-  uint64_t current_load = 0;
-  int node_index = -1;
+  std::vector<node_pair> transitions;
   std::shared_ptr<routing::policy> routing_table;
-  uint64_t messages_visited = 0;
-  float load_weight;
 
-  caf::actor from_index(int index) {
+  caf::actor from_id(id_type index) {
     if (auto it
         = std::find_if(transitions.begin(), transitions.end(),
                        [=](const auto& p) { return p.second == index; });
@@ -50,8 +51,8 @@ struct node_state {
   }
 };
 
-caf::behavior node_actor(caf::stateful_actor<node_state>* self, int index,
-                         int seed, caf::actor listener, caf::actor parent,
+caf::behavior node_actor(caf::stateful_actor<node_state>* self, id_type node_id,
+                         seed_type seed, caf::actor listener, caf::actor parent,
                          routing::hyperparameters params, bool random);
 
 } // namespace actors

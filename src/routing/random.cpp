@@ -8,15 +8,7 @@
 
 namespace routing {
 
-random::random() {
-  // nop
-}
-
-random::~random() {
-  // nop
-}
-
-void random::init(int, hyperparameters) {
+void random::init(seed_type, hyperparameters) {
   // nop
 }
 
@@ -24,11 +16,11 @@ void random::update(const message&) {
   // nop
 }
 
-void random::delete_route(int) {
+void random::delete_route(id_type) {
   // nop
 }
 
-int random::get_route(int) {
+id_type random::get_route(id_type) {
   return -1;
 }
 

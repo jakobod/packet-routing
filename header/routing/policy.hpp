@@ -1,40 +1,37 @@
 /**
  * @author Jakob Otto
  * @email jakob.otto@haw-hamburg.de
- * @file table.hpp
+ * @file policy.hpp
  */
 
 #pragma once
 
-#include <iostream>
 #include <random>
 
 #include "routing/hyperparameters.hpp"
 #include "routing/message.hpp"
+#include "types.hpp"
 
 namespace routing {
 
 /// An interface for a routing table.
 class policy {
 public:
+  // -- constructors, destructors ----------------------------------------------
+
   virtual ~policy() = default;
 
-  virtual void init(int, hyperparameters) {
-    std::cerr << "init not implemented" << std::endl;
-  }
+  // -- initialization ---------------------------------------------------------
 
-  virtual void update(const message&) {
-    std::cerr << "update not implemented" << std::endl;
-  }
+  virtual void init(seed_type seed, hyperparameters params) = 0;
 
-  virtual void delete_route(int) {
-    std::cerr << "delete_route not implemented" << std::endl;
-  }
+  // -- public API -------------------------------------------------------------
 
-  virtual int get_route(int) {
-    std::cerr << "get_route not implemented" << std::endl;
-    return -1;
-  }
+  virtual void update(const message& msg) = 0;
+
+  virtual void delete_route(id_type node_id) = 0;
+
+  virtual id_type get_route(id_type destination) = 0;
 
 protected:
   std::mt19937 gen;

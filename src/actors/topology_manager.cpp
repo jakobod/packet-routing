@@ -11,7 +11,6 @@
 #include "caf/actor_ostream.hpp"
 #include "caf/event_based_actor.hpp"
 #include "caf/fwd.hpp"
-#include "caf/local_actor.hpp"
 #include "caf/stateful_actor.hpp"
 #include "type_ids.hpp"
 
@@ -27,7 +26,8 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
   self->link_to(listener);
 
   return {
-    [=](generate_atom, size_t num_nodes, size_t num_transitions, int seed) {
+    [=](generate_atom, size_t num_nodes, size_t num_transitions,
+        seed_type seed) {
       self->state.graph = graph::generate_random_graph(num_nodes,
                                                        num_transitions, seed);
       auto& g = self->state.graph;

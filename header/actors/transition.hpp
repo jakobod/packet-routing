@@ -8,14 +8,12 @@
 
 #include "caf/behavior.hpp"
 #include "caf/stateful_actor.hpp"
+#include "types.hpp"
 
 namespace actors {
 
-using node_pair = std::pair<caf::actor, int>;
-using EdgeIndex = std::pair<int, int>;
-
 struct transition_state {
-  uint64_t weight = 0;
+  weight_type weight = 0;
   EdgeIndex index;
   size_t received_dones = 0;
 };

@@ -12,25 +12,27 @@
 #include <iostream>
 #include <random>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "caf/actor.hpp"
 #include "caf/behavior.hpp"
 #include "caf/stateful_actor.hpp"
 #include "routing/message.hpp"
+#include "types.hpp"
 
 namespace benchmark {
 
 struct result {
-  result(size_t id, std::chrono::milliseconds time_created,
-         std::chrono::milliseconds time_received, std::vector<int> path,
+  result(id_type id, std::chrono::milliseconds time_created,
+         std::chrono::milliseconds time_received, std::vector<id_type> path,
          std::chrono::milliseconds duration, bool success)
-    : msg_id(id),
+    : success_(success),
+      msg_id(id),
+      path(std::move(path)),
       time_created_(time_created),
       time_received_(time_received),
-      path(std::move(path)),
-      duration(duration),
-      success_(success) {
+      duration(duration) {
     // nop
   }
 
@@ -46,21 +48,22 @@ struct result {
               << x.duration.count() << "," << (x.success_ ? "True" : "False");
   }
 
-  size_t msg_id;
+  bool success_;
+  id_type msg_id;
+  std::vector<id_type> path;
+
   std::chrono::milliseconds time_created_;
   std::chrono::milliseconds time_received_;
-  std::vector<int> path;
   std::chrono::milliseconds duration;
-  bool success_;
 };
 
 struct benchmarker_state {
   size_t delivered_messages = 0;
   std::vector<result> results;
-  std::vector<std::vector<int>> loads;
+  std::vector<std::vector<id_type>> loads;
   std::ofstream load_csv;
 
-  void save_load(std::string path) {
+  void save_load(std::string_view path) {
     std::ofstream load_os(path);
     load_os << "time,";
     for (size_t i = 0; i < loads.size(); ++i)
@@ -78,7 +81,7 @@ struct benchmarker_state {
     }
   }
 
-  void save_messages(std::string path) {
+  void save_messages(const std::string& path) {
     std::ofstream os(path);
     os << "content,time_created,time_received,path,duration,success"
        << std::endl;
@@ -88,7 +91,7 @@ struct benchmarker_state {
 };
 
 caf::behavior benchmarker(caf::stateful_actor<benchmarker_state>* self,
-                          size_t seed, size_t num_nodes, size_t num_messages,
+                          seed_type seed, size_t num_nodes, size_t num_messages,
                           std::string message_log_path,
                           std::string load_log_path);
 

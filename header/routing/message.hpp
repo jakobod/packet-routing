@@ -6,41 +6,42 @@
 
 #pragma once
 
-#include "caf/actor.hpp"
-
 #include <chrono>
-#include <string>
 #include <vector>
+
+#include "types.hpp"
 
 namespace routing {
 
 /// A message that can be routed through the network of nodes.
 struct message {
-  message(size_t id, int source, int destination);
+  message(id_type id, id_type source, id_type destination);
 
   message() = default;
 
   // -- members ----------------------------------------------------------------
 
-  size_t id() const;
+  [[nodiscard]] id_type id() const;
 
-  int source() const;
+  [[nodiscard]] id_type source() const;
 
-  int destination() const;
+  [[nodiscard]] id_type destination() const;
 
-  uint64_t last_weight() const;
+  [[nodiscard]] weight_type last_weight() const;
 
-  const std::vector<int>& path() const;
+  [[nodiscard]] std::vector<id_type>& path();
 
-  std::chrono::milliseconds time_created() const;
+  [[nodiscard]] const std::vector<id_type>& path() const;
+
+  [[nodiscard]] std::chrono::milliseconds time_created() const;
 
   // -- public-API -------------------------------------------------------------
 
-  void update_path(int current_hop);
+  void update_path(id_type current_hop);
 
-  void update_weight(uint64_t weight);
+  void update_weight(weight_type weight);
 
-  bool path_contains(int node_id) const;
+  [[nodiscard]] bool path_contains(id_type nid) const;
 
   // -- CAF inspection function ------------------------------------------------
 
@@ -56,13 +57,13 @@ struct message {
 
 private:
   // Addressing
-  size_t id_;
-  int source_;
-  int destination_;
+  id_type id_ = 0;
+  id_type source_ = 0;
+  id_type destination_ = 0;
 
   // Path information
-  std::vector<int> path_;
-  uint64_t last_weight_ = 0;
+  std::vector<id_type> path_;
+  weight_type last_weight_ = 0;
   std::chrono::milliseconds time_created_;
 };
 

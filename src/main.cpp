@@ -32,8 +32,7 @@ struct config : actor_system_config {
            "Evaporation coefficient of pheromones")
       .add(alpha, "alpha,a", "Controls the influence of the pheromones")
       .add(beta, "beta,b", "Controls the influence of the path weight")
-      .add(load_weight, "load_weight,l", "Controls Weight of load")
-      .add(waitTime, "waitTime,w", "Sets wait time for each generated message in ms");
+      .add(load_weight, "load_weight,l", "Controls Weight of load");
 
     opt_group{custom_options_, "logging"}
       .add(message_log_path, "message-log-path",
@@ -49,14 +48,13 @@ struct config : actor_system_config {
   // Graph generation
   size_t num_nodes = 1;
   size_t num_transitions = 1;
-  int seed = 0;
-  int waitTime = 5;
+  seed_type seed = 0;
   // Hyperparameters (learning)
   double pheromone_deposition = 1;
   double pheromone_evaporation = 0.5;
   double alpha = 1;
   double beta = 1;
-  float load_weight = 1;
+  double load_weight = 1;
   // logging
   std::string message_log_path = "message-log.csv";
   std::string load_log_path = "load-log.csv";
@@ -65,8 +63,7 @@ struct config : actor_system_config {
 
 void caf_main(actor_system& sys, const config& args) {
   scoped_actor self{sys};
-  auto mg = sys.spawn(actors::message_generator, args.waitTime, args.seed,
-                      args.num_messages);
+  auto mg = sys.spawn(actors::message_generator, args.seed, args.num_messages);
   auto bm = sys.spawn(benchmark::benchmarker, args.seed, args.num_nodes,
                       args.num_messages, args.message_log_path,
                       args.load_log_path);

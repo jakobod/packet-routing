@@ -4,20 +4,15 @@
  * @file ant.cpp
  */
 
-#include <iostream>
+#include <limits>
+#include <numeric>
 
 #include "routing/ant.hpp"
 #include "routing/message.hpp"
 
-using namespace caf;
-
 namespace routing {
 
-ant::~ant() {
-  // nop
-}
-
-void ant::init(int seed, routing::hyperparameters params) {
+void ant::init(seed_type seed, hyperparameters params) {
   this->gen.seed(seed);
   params_ = params;
 }
@@ -31,22 +26,22 @@ void ant::update(const message& msg) {
       e.decay();
     if (auto to_update = std::find_if(entry_l.begin(), entry_l.end(),
                                       [&](const auto& v) {
-                                        return v.next_hop_index_
-                                               == msg.path().back();
+                                        return v.next_hop == msg.path().back();
                                       });
         to_update != entry_l.end()) {
       to_update->update(msg.last_weight());
     } else {
       routing::entry e{msg.path().back(), params_};
       e.update(msg.last_weight());
-      entry_l.emplace_back(std::move(e));
+      entry_l.emplace_back(e);
     }
   }
 }
 
-void ant::delete_route(int) {
-  for (auto map_it = routes.begin(); map_it != routes.end(); ++map_it) {
-    for (auto list_it = map_it->second.begin(); list_it != map_it->second.end();
+void ant::delete_route([[maybe_unused]] id_type node_id) {
+  // for (auto map_it = routes.begin(); map_it != routes.end(); ++map_it) {
+  for (const auto& p : routes) {
+    for (auto list_it = p.second.begin(); list_it != p.second.end();
          ++list_it) {
       // TODO
       /*if (list_it->next_hop_index == dest) {
@@ -56,22 +51,20 @@ void ant::delete_route(int) {
   }
 }
 
-int ant::get_route(int dest) {
-  double sum_of_values = 0.0;
-  auto it = routes.find(dest);
+id_type ant::get_route(id_type destination) {
+  auto it = routes.find(destination);
   if (it != routes.end()) {
-    auto& entry_l = it->second;
-    for (const auto& item : entry_l)
-      sum_of_values += item.value();
-    std::uniform_real_distribution<> random(0, sum_of_values);
+    auto& entries = it->second;
+    auto sum = std::accumulate(entries.begin(), entries.end(), 0);
+    std::uniform_real_distribution<> random(0, sum);
     auto randomValue = random(this->gen);
-    for (const auto& e : entry_l) {
+    for (const auto& e : entries) {
       if (randomValue < e.value())
-        return e.next_hop_index_;
+        return e.next_hop;
       randomValue -= e.value();
     }
   }
-  return -1;
+  return std::numeric_limits<id_type>::max();
 }
 
 } // namespace routing

@@ -13,13 +13,15 @@
 #include "graph/generator.hpp"
 #include "routing/hyperparameters.hpp"
 
+#include "types.hpp"
+
 namespace actors {
 
-using edge_index = std::pair<int, int>;
+using edge_index = std::pair<id_type, id_type>;
 
 struct topology_manager_state {
   std::map<edge_index, caf::actor> transitions;
-  std::map<int, caf::actor> nodes;
+  std::map<id_type, caf::actor> nodes;
   size_t initialized_transitions = 0;
   graph::undirected_graph graph;
 };

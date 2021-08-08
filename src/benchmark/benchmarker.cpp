@@ -15,13 +15,17 @@
 #include "type_ids.hpp"
 
 using namespace caf;
-using namespace std::chrono;
+
+using std::chrono::duration_cast;
+using std::chrono::milliseconds;
+using std::chrono::steady_clock;
 
 namespace benchmark {
 
-behavior benchmarker(stateful_actor<benchmarker_state>* self, size_t,
-                     size_t num_nodes, size_t num_messages,
-                     std::string message_log_path, std::string load_log_path) {
+behavior benchmarker(stateful_actor<benchmarker_state>* self,
+                     [[maybe_unused]] seed_type seed, size_t num_nodes,
+                     size_t num_messages, std::string message_log_path,
+                     std::string load_log_path) {
   self->set_default_handler(drop);
   self->state.loads.resize(num_nodes);
   return {
@@ -47,7 +51,7 @@ behavior benchmarker(stateful_actor<benchmarker_state>* self, size_t,
         self->quit();
       }
     },
-    [=](share_load_atom, uint64_t current_load, int id) {
+    [=](share_load_atom, load_type current_load, id_type id) {
       self->state.loads.at(id).push_back(current_load);
     },
   };

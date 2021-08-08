@@ -1,39 +1,39 @@
+/**
+ * @author Jakob Otto
+ * @email jakob.otto@haw-hamburg.de
+ * @file entry.cpp
+ */
+
 #include "routing/entry.hpp"
 
-#include <iostream>
+#include <cmath>
 
 namespace routing {
 
-// -- Constructors -------------------------------------------------------------
-
-entry::entry(int next_hop_index, hyperparameters params)
-  : next_hop_index_(next_hop_index),
-    alpha_(params.alpha),
-    beta_(params.beta),
-    pheromone_evaporation_(params.pheromone_evaporation),
-    pheromone_deposition_(params.pheromone_deposition) {
+entry::entry(id_type next_hop, hyperparameters params)
+  : next_hop(next_hop),
+    alpha(params.alpha),
+    beta(params.beta),
+    pheromone_evaporation(params.pheromone_evaporation),
+    pheromone_deposition(params.pheromone_deposition) {
   // nop
 }
 
-// -- public API ---------------------------------------------------------------
-
 double entry::value() const {
-  return std::pow(pheromones_, alpha_) * std::pow(weight_, beta_);
+  return std::pow(pheromones, alpha) * std::pow(weight, beta);
 }
 
-void entry::update(uint64_t weight) {
-  pheromones_ += pheromone_deposition_;
-  weight_ = weight;
+void entry::update(weight_type weight) {
+  pheromones += pheromone_deposition;
+  this->weight = weight;
 }
 
 void entry::decay() {
-  pheromones_ = (1 - pheromone_evaporation_) * pheromones_;
+  pheromones = (1 - pheromone_evaporation) * pheromones;
 }
 
-// -- equality operators -------------------------------------------------------
-
 bool entry::operator==(const entry& other) const {
-  return (next_hop_index_ == other.next_hop_index_);
+  return (next_hop == other.next_hop);
 }
 
 bool entry::operator!=(const entry& other) const {
