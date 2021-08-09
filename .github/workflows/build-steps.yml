@@ -4,13 +4,39 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: "Ubuntu Latest GCC",
+            artifact: "Linux.tar.xz",
+            os: ubuntu-latest,
+            build_type: "Release",
+            cc: "gcc",
+            cxx: "g++"
+          }
+        - {
+            name: "macOS Latest Clang",
+            artifact: "macOS.tar.xz",
+            os: macos-latest,
+            build_type: "Release",
+            cc: "clang",
+            cxx: "clang++"
+          }
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v1
 
     - name: Install Boost
-      run: sudo apt install -y libboost-graph1.65-dev
+      run: |
+        if [ "$(uname)" == "Darwin" ]; then
+          brew install boost
+        elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+          sudo apt install -y libboost-graph-dev
+        fi
 
     - name: Configure
       run: ./configure --build-type=Release
