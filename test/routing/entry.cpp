@@ -32,14 +32,4 @@ CAF_TEST(initialization) {
   CAF_CHECK_EQUAL(e.next_hop, id_type(1));
 }
 
-CAF_TEST(initialization) {
-  CAF_CHECK_EQUAL(e.pheromones, 0);
-  CAF_CHECK_EQUAL(e.weight, params.load_weight);
-  CAF_CHECK_EQUAL(e.pheromone_deposition, params.pheromone_deposition);
-  CAF_CHECK_EQUAL(e.pheromone_evaporation, params.pheromone_evaporation);
-  CAF_CHECK_EQUAL(e.beta, params.beta);
-  CAF_CHECK_EQUAL(e.alpha, params.alpha);
-  CAF_CHECK_EQUAL(e.next_hop, id_type(1));
-}
-
 CAF_TEST_FIXTURE_SCOPE_END()
