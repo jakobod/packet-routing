@@ -26,6 +26,7 @@ CAF_TEST(generate 100 messages) {
   self->send(gen, add_node_atom_v, self);
   CAF_MESSAGE("Starting the message generation");
   self->send(gen, generate_message_atom_v);
+  run();
   int received = 0;
   self->receive_for(received, 100)([&](message_atom, routing::message) {});
   CAF_CHECK_EQUAL(received, 100);

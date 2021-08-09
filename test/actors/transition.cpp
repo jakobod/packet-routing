@@ -1,20 +1,22 @@
 #define CAF_SUITE actors.transition
 
+#include "actors/transition.hpp"
+
 #include "caf/test/dsl.hpp"
 
 #include <utility>
 
-#include "actors/transition.hpp"
 #include "routing/message.hpp"
 #include "type_ids.hpp"
+#include "types.hpp"
 
 using namespace caf;
 
 namespace {
 
-constexpr int node_1_id = 1;
-constexpr int node_2_id = 2;
-constexpr int trans_weight = 1;
+constexpr id_type node_1_id = 1;
+constexpr id_type node_2_id = 2;
+constexpr weight_type trans_weight = 1;
 
 struct fixture : test_coordinator_fixture<> {
   fixture()
@@ -31,8 +33,8 @@ struct fixture : test_coordinator_fixture<> {
 
   void skip_register_messages() {
     run();
-    node_1->receive([](register_transition_atom, actor, int) {});
-    node_2->receive([](register_transition_atom, actor, int) {});
+    node_1->receive([](register_transition_atom, actor, id_type) {});
+    node_2->receive([](register_transition_atom, actor, id_type) {});
   }
 
   scoped_actor node_1;
@@ -49,9 +51,9 @@ CAF_TEST_FIXTURE_SCOPE(transition_tests, fixture)
 CAF_TEST(initialize) {
   CAF_MESSAGE("Expecting the transition to register itself");
   run();
-  expect((register_transition_atom, actor, int),
+  expect((register_transition_atom, actor, id_type),
          from(trans).to(node_1).with(_, _, node_2_id));
-  expect((register_transition_atom, actor, int),
+  expect((register_transition_atom, actor, id_type),
          from(trans).to(node_2).with(_, _, node_1_id));
   CAF_MESSAGE("Answering with done_atoms");
   node_1->send(trans, done_atom_v);
