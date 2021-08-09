@@ -6,6 +6,8 @@
 
 #include "routing/message.hpp"
 
+#include <algorithm>
+
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 using std::chrono::steady_clock;

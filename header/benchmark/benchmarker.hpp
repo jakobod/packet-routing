@@ -63,7 +63,7 @@ struct benchmarker_state {
   std::vector<std::vector<id_type>> loads;
   std::ofstream load_csv;
 
-  void save_load(std::string_view path) {
+  void save_load(const std::string& path) {
     std::ofstream load_os(path);
     load_os << "time,";
     for (size_t i = 0; i < loads.size(); ++i)
