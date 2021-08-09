@@ -37,7 +37,7 @@ struct node_state {
   }
 
   template <class Actor>
-  int from_act(Actor& act) {
+  id_type from_act(Actor& act) {
     if (auto it = std::find_if(transitions.begin(), transitions.end(),
                                [=](const auto& p) { return p.first == act; });
         it != transitions.end())
@@ -46,7 +46,7 @@ struct node_state {
   }
 
   caf::actor pick_random() {
-    std::uniform_int_distribution<> distrib(0, transitions.size() - 1);
+    std::uniform_int_distribution<id_type> distrib(0, transitions.size() - 1);
     return transitions.at(distrib(generator)).first;
   }
 };

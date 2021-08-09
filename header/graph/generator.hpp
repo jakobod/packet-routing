@@ -9,23 +9,24 @@
 #include <vector>
 
 #include "graph/edge.hpp"
+#include "types.hpp"
 
 namespace graph {
 
 // -- type declarations --------------------------------------------------------
 
-using vertex = int;
+using vertex = id_type;
 using undirected_graph
   = boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS,
                           boost::no_property,
-                          boost::property<boost::edge_weight_t, int>>;
+                          boost::property<boost::edge_weight_t, id_type>>;
 using vertex_list = std::vector<vertex>;
 using edge_list = std::vector<edge>;
 
 // -- Public API ---------------------------------------------------------------
 
 undirected_graph generate_random_graph(size_t num_verticies, size_t num_edges,
-                                       int seed);
+                                       seed_type seed);
 
 vertex_list get_verteces(const undirected_graph& g);
 

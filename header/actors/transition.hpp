@@ -20,7 +20,7 @@ struct transition_state {
 
 caf::behavior transition_actor(caf::stateful_actor<transition_state>* self,
                                node_pair node_1, node_pair node_2,
-                               caf::actor parent, int weight,
+                               caf::actor parent, weight_type weight,
                                caf::actor listener);
 
 } // namespace actors

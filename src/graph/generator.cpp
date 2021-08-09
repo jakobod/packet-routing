@@ -9,13 +9,13 @@ using namespace boost;
 namespace graph {
 
 undirected_graph generate_random_graph(size_t num_verticies, size_t num_edges,
-                                       int seed) {
+                                       seed_type seed) {
   std::mt19937 gen(seed);
-  std::uniform_int_distribution<> distrib(0, num_verticies - 1);
-  std::uniform_int_distribution<> edge_distrib(0, 100);
+  std::uniform_int_distribution<id_type> dist(0, num_verticies - 1);
+  std::uniform_int_distribution<weight_type> edge_dist(0, 100);
   edge_list edges;
   while (edges.size() < num_edges) {
-    edge new_edge{distrib(gen), distrib(gen), edge_distrib(gen)};
+    edge new_edge{dist(gen), dist(gen), edge_dist(gen)};
     // Does the edge connect the same node?
     if ((new_edge.node_1 == new_edge.node_2)
         || std::find(std::begin(edges), std::end(edges), new_edge)

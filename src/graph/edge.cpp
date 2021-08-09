@@ -8,7 +8,7 @@
 
 namespace graph {
 
-edge::edge(int node_1, int node_2, int weight)
+edge::edge(id_type node_1, id_type node_2, weight_type weight)
   : node_1(node_1), node_2(node_2), weight(weight) {
   // nop
 }

@@ -4,11 +4,9 @@
 #include "caf/fwd.hpp"
 #include "routing/message.hpp"
 #include "type_ids.hpp"
+#include "types.hpp"
 
 using namespace caf;
-
-using distribution_type = std::uniform_int_distribution<>;
-using dist_result_type = distribution_type::result_type;
 
 namespace actors {
 
@@ -19,10 +17,9 @@ behavior message_generator(stateful_actor<message_generator_state>* self,
     [=](generate_message_atom) {
       auto& state = self->state;
       if (state.nodes.size() >= 2) {
-        distribution_type dist(0, static_cast<dist_result_type>(
-                                    state.nodes.size() - 1));
-        auto source = static_cast<int>(dist(state.gen));
-        auto destination = static_cast<int>(dist(state.gen));
+        std::uniform_int_distribution<id_type> dist(0, state.nodes.size() - 1);
+        auto source = dist(state.gen);
+        auto destination = dist(state.gen);
         routing::message msg(self->state.num_messages, source, destination);
         self->send(state.nodes.at(source), message_atom_v, msg);
       }
