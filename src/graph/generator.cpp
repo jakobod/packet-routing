@@ -1,5 +1,6 @@
 #include "graph/generator.hpp"
 
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <random>
@@ -13,10 +14,12 @@ namespace graph {
 undirected_graph generate_random_graph(size_t num_nodes, size_t num_transitions,
                                        seed_type seed) {
   const auto max_num_transitions = ((num_nodes * (num_nodes - 1)) / 2);
-  if (num_transitions > max_num_transitions)
+  if (num_transitions > max_num_transitions) {
     std::cout << "The number of transitions is too large! with " << num_nodes
               << " nodes there can only be " << max_num_transitions
               << std::endl;
+    std::abort();
+  }
   std::mt19937 gen(seed);
   std::uniform_int_distribution<id_type> dist(0, num_nodes - 1);
   std::uniform_int_distribution<weight_type> edge_dist(0, 100);
