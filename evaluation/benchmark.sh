@@ -15,27 +15,28 @@ mkdir -p ${log_path}
 num_packets=1000000
 seed=123456
 
-function ant_benchmark() {
-  num_nodes=${1}
-  num_transitions=${2}
-  for d in $(seq 0 0.1 1); do
-    for e in $(seq 0 0.1 1); do
-      for a in $(seq 0 0.1 1); do
-        for b in $(seq 0 0.1 1); do
-          message_log_path=${output_path}/ant_message_${a}_${b}_${d}_${e}.csv
-          load_log_path=${output_path}/ant_load_${a}_${b}_${d}_${e}.csv
-          log_path=${log_path}/ant_${a}_${b}_${d}_${e}.log
-          # Until we find the problem with the segfaults, this has to suffice..
-          echo "*** Running ant benchmark with: num_nodes=${num_nodes}, num_transitions=${num_transitions}, a=${a}, b=${b}, d=${d}, and e=${e}..."
-          until build/main -n${num_nodes} -t${num_transitions} -s${seed} -a${a} -b${b} -d${d} -e${e} -m${num_packets} --logging.message-log-path=${message_log_path} --logging.load-log-path=${load_log_path} > ${log_path}; do
-            echo "!!! benchmark with num_nodes=${num_nodes}, num_transitions=${num_transitions}, a=${a}, b=${b}, d=${d}, and e=${e} failed. Rerunning..."
+for num_nodes in 100 1000 do
+  for num_transitions in 1000 10000 do
+    for d in 0 1 do
+      for e in 0 1 do
+        for a in 0 1 do
+          for b in 0 1; do
+            message_log_path=${output_path}/ant_message_${a}_${b}_${d}_${e}.csv
+            load_log_path=${output_path}/ant_load_${a}_${b}_${d}_${e}.csv
+            log_path=${log_path}/ant_${a}_${b}_${d}_${e}.log
+            # Until we find the problem with the segfaults, this has to suffice..
+            echo "*** Running ant benchmark with: num_nodes=${num_nodes}, num_transitions=${num_transitions}, a=${a}, b=${b}, d=${d}, and e=${e}..."
+            until build/main -n${num_nodes} -t${num_transitions} -s${seed} -a${a} -b${b} -d${d} -e${e} -m${num_packets} --logging.message-log-path=${message_log_path} --logging.load-log-path=${load_log_path} > ${log_path}; do
+              echo "!!! benchmark with num_nodes=${num_nodes}, num_transitions=${num_transitions}, a=${a}, b=${b}, d=${d}, and e=${e} failed. Rerunning..."
+            done;
+            echo "*** Done with benchmark num_nodes=${num_nodes}, num_transitions=${num_transitions}, a=${a}, b=${b}, d=${d}, and e=${e}!"
           done;
-          echo "*** Done with benchmark num_nodes=${num_nodes}, num_transitions=${num_transitions}, a=${a}, b=${b}, d=${d}, and e=${e}!"
         done;
       done;
     done;
   done;
-}
+done;
+
 
 function random_benchmark() {
   num_nodes=${1}

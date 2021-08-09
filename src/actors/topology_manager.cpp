@@ -36,30 +36,31 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
       aout(self) << "[topo] Generated graph. Written to graph.log."
                  << std::endl;
       aout(self) << "[topo] Adding nodes" << std::endl;
-      for (const auto& node : graph::get_verteces(g)) {
+      for (const auto& node : graph::get_nodes(g)) {
         auto node_ref = self->spawn(node_actor, node, seed, listener, self,
                                     params, random);
         self->send(message_generator, add_node_atom_v, node_ref);
         self->state.nodes.emplace(node, std::move(node_ref));
       }
       aout(self) << "[topo] Adding transitions" << std::endl;
-      for (const auto& e : graph::get_edges(g)) {
-        auto node_one = std::make_pair(self->state.nodes.at(e.node_1),
-                                       e.node_1);
-        auto node_two = std::make_pair(self->state.nodes.at(e.node_2),
-                                       e.node_2);
-        self->state.transitions.emplace(std::make_pair(e.node_1, e.node_2),
-                                        self->spawn(transition_actor, node_one,
-                                                    node_two, self, e.weight,
-                                                    listener));
+      for (const auto& trans : graph::get_transitions(g)) {
+        auto node_one = std::make_pair(self->state.nodes.at(trans.node_1),
+                                       trans.node_1);
+        auto node_two = std::make_pair(self->state.nodes.at(trans.node_2),
+                                       trans.node_2);
+        self->state.transitions.emplace(
+          std::make_pair(trans.node_1, trans.node_2),
+          self->spawn(transition_actor, node_one, node_two, self, trans.weight,
+                      listener));
       }
       aout(self) << "[topo] Finished building graph with "
-                 << graph::num_edges(g) << " edges and "
-                 << graph::num_verteces(g) << " verteces." << std::endl;
+                 << graph::num_transitions(g) << " transitions and "
+                 << graph::num_nodes(g) << " nodes." << std::endl;
     },
     [=](done_atom) {
       auto& state = self->state;
-      if (++state.initialized_transitions >= graph::num_edges(state.graph)) {
+      if (++state.initialized_transitions
+          >= graph::num_transitions(state.graph)) {
         aout(self) << "[topo] Transitions initialized" << std::endl;
         self->send(message_generator, generate_message_atom_v);
       }

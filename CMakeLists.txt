@@ -44,8 +44,8 @@ set(
   src/actors/node.cpp
   src/actors/topology_manager.cpp
   src/actors/transition.cpp
-  src/graph/edge.cpp
   src/graph/generator.cpp
+  src/graph/transition.cpp
   src/routing/ant.cpp
   src/routing/message.cpp
   src/routing/entry.cpp

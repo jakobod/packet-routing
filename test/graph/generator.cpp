@@ -7,19 +7,19 @@
 #include "graph/generator.hpp"
 
 CAF_TEST(Generate graph) {
-  const size_t num_verteces = 10;
-  const size_t num_edges = 18;
+  const size_t num_nodes = 10;
+  const size_t num_transitions = 18;
   const size_t seed = 0;
-  auto g = graph::generate_random_graph(num_verteces, num_edges, seed);
-  auto verteces = graph::get_verteces(g);
-  auto edges = graph::get_edges(g);
-  CAF_MESSAGE("Check vertex list");
-  CAF_CHECK_EQUAL(num_verteces, verteces.size());
-  std::unordered_set<graph::vertex> vertex_set{verteces.begin(),
-                                               verteces.end()};
-  CAF_CHECK_EQUAL(verteces.size(), vertex_set.size());
-  CAF_MESSAGE("Check edge list");
-  CAF_CHECK_EQUAL(num_edges, edges.size());
-  std::unordered_set<graph::edge> edge_set{edges.begin(), edges.end()};
-  CAF_CHECK_EQUAL(edges.size(), edge_set.size());
+  auto g = graph::generate_random_graph(num_nodes, num_transitions, seed);
+  auto nodes = graph::get_nodes(g);
+  auto transitions = graph::get_transitions(g);
+  CAF_MESSAGE("Check nodes");
+  CAF_CHECK_EQUAL(num_nodes, nodes.size());
+  std::unordered_set<graph::node> node_set{nodes.begin(), nodes.end()};
+  CAF_CHECK_EQUAL(nodes.size(), node_set.size());
+  CAF_MESSAGE("Check transitions");
+  CAF_CHECK_EQUAL(num_transitions, transitions.size());
+  std::unordered_set<graph::transition> transition_set{transitions.begin(),
+                                                       transitions.end()};
+  CAF_CHECK_EQUAL(transitions.size(), transition_set.size());
 }

@@ -1,46 +1,53 @@
 #include "graph/generator.hpp"
 
-#include <boost/graph/graphviz.hpp>
 #include <fstream>
+#include <iostream>
 #include <random>
+
+#include "boost/graph/graphviz.hpp"
 
 using namespace boost;
 
 namespace graph {
 
-undirected_graph generate_random_graph(size_t num_verticies, size_t num_edges,
+undirected_graph generate_random_graph(size_t num_nodes, size_t num_transitions,
                                        seed_type seed) {
+  const auto max_num_transitions = ((num_nodes * (num_nodes - 1)) / 2);
+  if (num_transitions > max_num_transitions)
+    std::cout << "The number of transitions is too large! with " << num_nodes
+              << " nodes there can only be " << max_num_transitions
+              << std::endl;
   std::mt19937 gen(seed);
-  std::uniform_int_distribution<id_type> dist(0, num_verticies - 1);
+  std::uniform_int_distribution<id_type> dist(0, num_nodes - 1);
   std::uniform_int_distribution<weight_type> edge_dist(0, 100);
-  edge_list edges;
-  while (edges.size() < num_edges) {
-    edge new_edge{dist(gen), dist(gen), edge_dist(gen)};
+  transition_list transitions;
+  while (transitions.size() < num_transitions) {
+    transition new_transition{dist(gen), dist(gen), edge_dist(gen)};
     // Does the edge connect the same node?
-    if ((new_edge.node_1 == new_edge.node_2)
-        || std::find(std::begin(edges), std::end(edges), new_edge)
-             != edges.end())
+    if ((new_transition.node_1 == new_transition.node_2)
+        || std::find(transitions.begin(), transitions.end(), new_transition)
+             != transitions.end())
       continue;
-    edges.emplace_back(std::move(new_edge));
+    transitions.emplace_back(std::move(new_transition));
   }
-  undirected_graph g(num_verticies);
-  for (const auto& e : edges)
+  undirected_graph g(num_nodes);
+  for (const auto& e : transitions)
     add_edge(e.node_1, e.node_2, e.weight, g);
   return g;
 }
 
-vertex_list get_verteces(const undirected_graph& g) {
+node_list get_nodes(const undirected_graph& g) {
   auto index = boost::get(vertex_index, g);
-  vertex_list result;
+  node_list result;
   for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
     result.push_back(index[*vp.first]);
   return result;
 }
 
-edge_list get_edges(const undirected_graph& g) {
+transition_list get_transitions(const undirected_graph& g) {
   auto vertex_id = boost::get(vertex_index, g);
   auto weightmap = boost::get(boost::edge_weight, g);
-  edge_list result;
+  transition_list result;
   for (auto ei = boost::edges(g).first; ei != boost::edges(g).second; ++ei) {
     auto src = boost::source(*ei, g), targ = boost::target(*ei, g);
     auto weight = get(weightmap, *ei);
@@ -51,11 +58,11 @@ edge_list get_edges(const undirected_graph& g) {
   return result;
 }
 
-size_t num_verteces(const undirected_graph& g) {
+size_t num_nodes(const undirected_graph& g) {
   return boost::num_vertices(g);
 }
 
-size_t num_edges(const undirected_graph& g) {
+size_t num_transitions(const undirected_graph& g) {
   return boost::num_edges(g);
 }
 

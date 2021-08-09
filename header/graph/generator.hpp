@@ -8,33 +8,33 @@
 #include <utility>
 #include <vector>
 
-#include "graph/edge.hpp"
+#include "graph/transition.hpp"
 #include "types.hpp"
 
 namespace graph {
 
 // -- type declarations --------------------------------------------------------
 
-using vertex = id_type;
+using node = id_type;
 using undirected_graph
   = boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS,
                           boost::no_property,
                           boost::property<boost::edge_weight_t, id_type>>;
-using vertex_list = std::vector<vertex>;
-using edge_list = std::vector<edge>;
+using node_list = std::vector<node>;
+using transition_list = std::vector<transition>;
 
 // -- Public API ---------------------------------------------------------------
 
-undirected_graph generate_random_graph(size_t num_verticies, size_t num_edges,
+undirected_graph generate_random_graph(size_t num_nodes, size_t num_transitions,
                                        seed_type seed);
 
-vertex_list get_verteces(const undirected_graph& g);
+node_list get_nodes(const undirected_graph& g);
 
-edge_list get_edges(const undirected_graph& g);
+transition_list get_transitions(const undirected_graph& g);
 
-size_t num_verteces(const undirected_graph& g);
+size_t num_nodes(const undirected_graph& g);
 
-size_t num_edges(const undirected_graph& g);
+size_t num_transitions(const undirected_graph& g);
 
 void log_graph(const undirected_graph& g,
                const std::string& path = "graph.log");
