@@ -85,7 +85,7 @@ function(add_test_suites target)
     target_sources(${target} PRIVATE
       "${CMAKE_CURRENT_SOURCE_DIR}/test/${suitePath}.cpp")
     add_test(NAME ${suiteName}
-             COMMAND ${target} -r300 -n -v5 -s"^${suiteName}$")
+             COMMAND ${target} -r300 -n -v5 -s${suiteName})
   endforeach()
 endfunction()
 
