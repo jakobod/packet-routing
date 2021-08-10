@@ -41,6 +41,10 @@ behavior benchmarker(stateful_actor<benchmarker_state>* self,
         aout(self) << "[benchmarker] received "
                    << self->state.delivered_messages << std::endl;
       if (++self->state.delivered_messages >= num_messages) {
+        std::sort(self->state.results.begin(), self->state.results.end(),
+                  [](const auto& a, const auto& b) {
+                    return a.msg_id < b.msg_id;
+                  });
         self->state.save_messages(message_log_path);
         self->state.save_load(load_log_path);
         aout(self) << "Benchmark done.\nThe benchmark took: "

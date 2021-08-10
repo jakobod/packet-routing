@@ -37,14 +37,8 @@ struct result {
   }
 
   friend std::ostream& operator<<(std::ostream& os, const result& x) {
-    std::ostringstream formattedPath;
-    if (!x.path.empty()) {
-      std::copy(x.path.begin(), x.path.end() - 1,
-                std::ostream_iterator<int>(formattedPath, " "));
-      formattedPath << !x.path.back();
-    }
     return os << x.msg_id << "," << x.time_created_.count() << ","
-              << x.time_received_.count() << "," << formattedPath.str() << ","
+              << x.time_received_.count() << "," << x.path.size() << ","
               << x.duration.count() << "," << (x.success_ ? "True" : "False");
   }
 
@@ -83,7 +77,7 @@ struct benchmarker_state {
 
   void save_messages(const std::string& path) {
     std::ofstream os(path);
-    os << "content,time_created,time_received,path,duration,success"
+    os << "msg_id,time_created,time_received,path_length,duration,arrived"
        << std::endl;
     for (const auto& res : results)
       os << res << std::endl;
