@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import argparse
 import numpy as np
 
-
 plt.rc('figure', figsize=(16, 9))
 
 
@@ -42,7 +41,7 @@ def plot_single(input, output, title):
 
 def plot_multiple(inputs, output, title):
   print('plotting multiple')
-  fig, ax = plt.subplots()
+  _, ax = plt.subplots()
   for input in inputs:
     df = pd.read_csv(input)
     y_av = movingaverage(df['duration'], 100)
@@ -61,7 +60,7 @@ def throughput(inputs, output, title):
     df = pd.read_csv(input)
     print(df)
     begin = df['time_created'][0]
-    end = df['time_received'][len(df['time_received'])-1]
+    end = df['time_received'][len(df['time_received']) - 1]
     print(f'begin = {begin}, end = {end}')
     runtime = (end - begin) / 1000
     throughput = len(df) / runtime
@@ -103,7 +102,7 @@ def main():
   parser.add_argument(
       '--title', '-t', help='The title of the plot', metavar='TITLE')
   parser.add_argument(
-      '--mode', '-m', help='The mode in which to run the script', default='plot')
+      '--mode', '-m', help='The mode of the script', default='plot')
 
   args = parser.parse_args()
   if args.mode == 'success':
