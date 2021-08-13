@@ -1,14 +1,27 @@
+#!/Users/boss/code/packet-routing/evaluation/envs/bin/python
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import argparse
 import numpy as np
 
+
+# File name convention
+# ${name}_${num_nodes}_${num_transitions}_${a}_${b}_${d}_${e}
+
+# TODO
+# [ ] Plot path length
+# [ ] Plot duration
+# [ ] Plot success
+
+
 plt.rc('figure', figsize=(16, 9))
 
 
 def movingaverage(interval, window_size):
-  window = np.ones(int(window_size))/float(window_size)
-  return np.convolve(interval, window, 'same')
+  window = np.ones(int(window_size)) / float(window_size)
+  res = np.convolve(interval, window, 'same')
+  return res, np.mean(res)
 
 
 def save_or_show(output):
@@ -21,9 +34,8 @@ def save_or_show(output):
 def plot_single(input, output, title):
   print('plotting single')
   df = pd.read_csv(input)
-  print(df)
-  df.plot(y='duration', zorder=1)
-  y_av = movingaverage(df['duration'], 100)
+  df.plot.scatter(x='msg_id', y='duration', zorder=1, s=5, alpha=0.1)
+  y_av, _ = movingaverage(df['duration'], 250)
   plt.plot(y_av, color='r', linestyle='-', zorder=2, label='moving average')
   mean_duration = df['duration'].mean()
   print(f'mean_duration={mean_duration}')
@@ -44,9 +56,25 @@ def plot_multiple(inputs, output, title):
   _, ax = plt.subplots()
   for input in inputs:
     df = pd.read_csv(input)
-    y_av = movingaverage(df['duration'], 100)
+    y_av, _ = movingaverage(df['duration'], 100)
     ax.plot(y_av, linestyle='-', label=input)
+  ax.legend()
+  plt.title(title)
+  plt.xlabel('Message number [#]')
+  plt.ylabel('Duration [ms]')
+  save_or_show(output)
 
+
+def plot_multiple_selection(inputs, output, title):
+  print('plotting multiple')
+  avgs = []
+  _, ax = plt.subplots()
+  for input in inputs:
+    df = pd.read_csv(input)
+    avg, mean = movingaverage(df['duration'], 1000)
+    avgs.append((avg, mean, input))
+  for tup in sorted(avgs, key=lambda tup: tup[1])[:4]:
+    ax.plot(tup[0], linestyle='-', label=tup[2])
   ax.legend()
   plt.title(title)
   plt.xlabel('Message number [#]')
@@ -55,7 +83,7 @@ def plot_multiple(inputs, output, title):
 
 
 def throughput(inputs, output, title):
-  fig, ax = plt.subplots()
+  _, ax = plt.subplots()
   for input in inputs:
     df = pd.read_csv(input)
     print(df)
@@ -65,7 +93,7 @@ def throughput(inputs, output, title):
     runtime = (end - begin) / 1000
     throughput = len(df) / runtime
     print(
-        f'runtime = {runtime}s, # messages = {len(df)}, throughput = {throughput}')
+        f'runtime = {runtime}s, # messages={len(df)}, throughput={throughput}')
     ax.bar(x=input, height=throughput, label=input)
   plt.title(title)
   plt.xticks(rotation=45)
@@ -93,6 +121,18 @@ def plot_success(inputs, output, title, window=100):
   save_or_show(output)
 
 
+def plot_duration(input):
+  df = pd.read_csv(input, nrows=10000)
+  print(df)
+  df.plot(x='msg_id', y='duration')
+
+
+def plot_path_length(input):
+  df = pd.read_csv(input, nrows=10000)
+  print(df)
+  df.plot(x='msg_id', y='path_length')
+
+
 def main():
   parser = argparse.ArgumentParser()
   parser.add_argument('--input', '-i', help='The input path',
@@ -105,15 +145,15 @@ def main():
       '--mode', '-m', help='The mode of the script', default='plot')
 
   args = parser.parse_args()
-  if args.mode == 'success':
-    plot_success(args.input, args.output, args.title)
-  elif args.mode == 'throughput':
-    throughput(args.input, args.output, args.title)
-  elif args.mode == 'plot':
-    if len(args.input) == 1:
-      plot_single(args.input[0], args.output, args.title)
-    else:
-      plot_multiple(args.input, args.output, args.title)
+  if not args.input:
+    print('Please specify an input to read')
+  elif len(args.input) == 1:
+    plot_single(args.input[0], args.output, args.title)
+  else:
+    # plot_success(args.input, args.output, args.title)
+    # throughput(args.input, args.output, args.title)
+    plot_multiple(args.input, args.output, args.title)
+    # plot_multiple_selection(args.input, args.output, args.title)
 
 
 if __name__ == '__main__':
