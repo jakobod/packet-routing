@@ -19,7 +19,9 @@ behavior message_generator(stateful_actor<message_generator_state>* self,
       if (state.nodes.size() >= 2) {
         std::uniform_int_distribution<id_type> dist(0, state.nodes.size() - 1);
         auto source = dist(state.gen);
-        auto destination = dist(state.gen);
+        id_type destination = 0;
+        while ((destination = dist(state.gen)) == source)
+          ;
         routing::message msg(self->state.num_messages, source, destination);
         self->send(state.nodes.at(source), message_atom_v, msg);
       }

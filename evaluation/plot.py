@@ -34,13 +34,13 @@ def save_or_show(output):
 def plot_single(input, output, title):
   print('plotting single')
   df = pd.read_csv(input)
-  df.plot.scatter(x='msg_id', y='duration', zorder=1, s=5, alpha=0.1)
-  y_av, _ = movingaverage(df['duration'], 250)
+  df.dropna()
+  df['mean'] = df.mean(axis=1)
+  print(df)
+  df.reset_index().plot.scatter(x='index', y='mean', zorder=1, s=5,
+                                alpha=0.1)
+  y_av, _ = movingaverage(df['mean'], 100)
   plt.plot(y_av, color='r', linestyle='-', zorder=2, label='moving average')
-  mean_duration = df['duration'].mean()
-  print(f'mean_duration={mean_duration}')
-  plt.hlines(mean_duration, xmin=0, xmax=len(
-      df), color='orange', zorder=3, label='mean runtime')
 
   ax = plt.gca()
   ax.legend()
@@ -48,6 +48,20 @@ def plot_single(input, output, title):
   plt.xlabel('Message number [#]')
   plt.ylabel('Duration [ms]')
 
+  save_or_show(output)
+
+
+def plot_multiple(inputs, output, title):
+  print('plotting multiple runs')
+  _, ax = plt.subplots()
+  for input in inputs:
+    df = pd.read_csv(input)
+    y_av, _ = movingaverage(df['duration'], 100)
+    ax.plot(y_av, linestyle='-', label=input)
+  ax.legend()
+  plt.title(title)
+  plt.xlabel('Message number [#]')
+  plt.ylabel('Duration [ms]')
   save_or_show(output)
 
 
@@ -141,8 +155,6 @@ def main():
       '--output', '-o', help='The output path', metavar='OUTPUT')
   parser.add_argument(
       '--title', '-t', help='The title of the plot', metavar='TITLE')
-  parser.add_argument(
-      '--mode', '-m', help='The mode of the script', default='plot')
 
   args = parser.parse_args()
   if not args.input:
@@ -152,7 +164,8 @@ def main():
   else:
     # plot_success(args.input, args.output, args.title)
     # throughput(args.input, args.output, args.title)
-    plot_multiple(args.input, args.output, args.title)
+    plot_multiple_runs(args.input, args.output, args.title)
+    # plot_multiple(args.input, args.output, args.title)
     # plot_multiple_selection(args.input, args.output, args.title)
 
 
