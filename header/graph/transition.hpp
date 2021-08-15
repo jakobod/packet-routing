@@ -8,6 +8,9 @@
 
 #include <cstddef>
 #include <functional>
+#include <sstream>
+#include <unordered_set>
+#include <vector>
 
 #include "types.hpp"
 
@@ -19,10 +22,19 @@ struct transition {
   bool operator==(const transition& other) const;
   bool operator!=(const transition& other) const;
 
+  friend std::ostream& operator<<(std::ostream& os, const transition& t) {
+    std::stringstream ss;
+    ss << t.node_1 << " <" << t.weight << "> " << t.node_2;
+    return os << ss.str();
+  }
+
   id_type node_1;
   id_type node_2;
   id_type weight;
 };
+
+using transition_list = std::vector<transition>;
+using transition_set = std::unordered_set<transition>;
 
 } // namespace graph
 

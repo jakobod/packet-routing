@@ -14,10 +14,6 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 add_compile_options(-Wall -Wextra -pedantic)
 
-# -- add external libraries ----------------------------------------------------
-
-find_package(Boost 1.65 COMPONENTS graph REQUIRED)
-
 # -- fetch actor-framework repo ------------------------------------------------
 
 FetchContent_Declare(
@@ -45,8 +41,8 @@ set(
   src/actors/node.cpp
   src/actors/topology_manager.cpp
   src/actors/transition.cpp
-  src/graph/generator.cpp
   src/graph/transition.cpp
+  src/graph/undirected_graph.cpp
   src/routing/ant.cpp
   src/routing/message.cpp
   src/routing/entry.cpp
@@ -61,8 +57,7 @@ add_library(${obj_lib_target} OBJECT
 set_property(TARGET ${obj_lib_target} PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_include_directories(${obj_lib_target} PRIVATE
                            "${CMAKE_CURRENT_SOURCE_DIR}/header")
-caf_target_link_libraries(${obj_lib_target}
-                          CAF::core Boost::graph)
+caf_target_link_libraries(${obj_lib_target} CAF::core)
 
 # -- add executables -----------------------------------------------------------
 
@@ -102,7 +97,7 @@ add_test_suites(${tst_bin_target}
                 actors.node
                 actors.topology_manager
                 actors.transition
-                graph.generator
+                graph.undirected_graph
                 routing.ant
                 routing.entry
                 routing.message

@@ -38,8 +38,7 @@ struct config : actor_system_config {
       .add(message_log_path, "message-log-path",
            "The output path of the resulting message log csv")
       .add(load_log_path, "load-log-path",
-           "The output path of the resulting load log csv")
-      .add(log_graph, "log", "Write the generated graph to graph.log");
+           "The output path of the resulting load log csv");
   }
 
   // Benchmark
@@ -58,7 +57,6 @@ struct config : actor_system_config {
   // logging
   std::string message_log_path = "message-log.csv";
   std::string load_log_path = "load-log.csv";
-  bool log_graph = false;
 };
 
 void caf_main(actor_system& sys, const config& args) {
@@ -72,7 +70,7 @@ void caf_main(actor_system& sys, const config& args) {
                 routing::hyperparameters{args.pheromone_deposition,
                                          args.pheromone_evaporation, args.alpha,
                                          args.beta, args.load_weight},
-                args.random, args.log_graph);
+                args.random);
   self->send(tm, generate_atom_v, args.num_nodes, args.num_transitions,
              args.seed);
 }
