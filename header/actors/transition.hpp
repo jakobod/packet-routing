@@ -14,7 +14,6 @@ namespace actors {
 
 struct transition_state {
   weight_type weight = 0;
-  EdgeIndex index;
   size_t received_dones = 0;
 };
 

@@ -32,8 +32,12 @@ public:
 
   id_type get_route(id_type destination) override;
 
+  routing_map get_routes() {
+    return routes_;
+  }
+
 private:
-  routing_map routes;
+  routing_map routes_;
   hyperparameters params_;
 };
 

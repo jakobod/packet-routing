@@ -20,7 +20,7 @@ void ant::init(seed_type seed, hyperparameters params) {
 void ant::update(const message& msg) {
   // Update every goal in the hop list
   for (const auto& index : msg.path()) {
-    auto [it, success] = routes.emplace(index, entry_list());
+    auto [it, success] = routes_.emplace(index, entry_list());
     auto& entry_l = it->second;
     for (auto& e : entry_l)
       e.decay();
@@ -38,25 +38,26 @@ void ant::update(const message& msg) {
   }
 }
 
-void ant::delete_route([[maybe_unused]] id_type node_id) {
-  // for (auto map_it = routes.begin(); map_it != routes.end(); ++map_it) {
-  for (const auto& p : routes) {
-    for (auto list_it = p.second.begin(); list_it != p.second.end();
-         ++list_it) {
-      // TODO
-      /*if (list_it->next_hop_index == dest) {
-        list_it = map_it->second.erase(list_it);
-      }*/
-    }
+void ant::delete_route(id_type node_id) {
+  // Delete the destination 'node_id' from the table
+  routes_.erase(node_id);
+  // Search for all occurrences of `node_id` as next hop and remove them
+  for (auto& p : routes_) {
+    auto& entries = p.second;
+    entries.erase(std::remove_if(entries.begin(), entries.end(),
+                                 [=](const auto& e) {
+                                   return e.next_hop == node_id;
+                                 }),
+                  entries.end());
   }
 }
 
 id_type ant::get_route(id_type destination) {
-  auto it = routes.find(destination);
-  if (it != routes.end()) {
+  auto it = routes_.find(destination);
+  if (it != routes_.end()) {
     auto& entries = it->second;
     auto sum = std::accumulate(entries.begin(), entries.end(), 0.0);
-    std::uniform_real_distribution<> random(0, sum);
+    std::uniform_real_distribution<double> random(0, sum);
     auto randomValue = random(this->gen);
     for (const auto& e : entries) {
       if (randomValue < e.value())

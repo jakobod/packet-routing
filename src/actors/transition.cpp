@@ -16,7 +16,6 @@ behavior transition_actor(caf::stateful_actor<transition_state>* self,
                           weight_type weight, caf::actor) {
   self->set_exit_handler([=](const exit_msg&) { self->quit(); });
   self->link_to(parent);
-  self->state.index = std::make_pair(node_1.second, node_2.second);
   self->send(node_1.first, register_transition_atom_v, self, node_2.second);
   self->send(node_2.first, register_transition_atom_v, self, node_1.second);
   self->state.weight = weight;

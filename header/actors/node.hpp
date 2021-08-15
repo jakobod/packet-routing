@@ -27,6 +27,16 @@ struct node_state {
   std::vector<node_pair> transitions;
   std::shared_ptr<routing::policy> routing_table;
 
+  void remove_transition(const caf::actor_addr& source) {
+    auto node_id = from_act(source);
+    routing_table->delete_route(node_id);
+    transitions.erase(std::remove_if(transitions.begin(), transitions.end(),
+                                     [=](const auto& p) {
+                                       return p.first == source;
+                                     }),
+                      transitions.end());
+  }
+
   caf::actor from_id(id_type index) {
     if (auto it
         = std::find_if(transitions.begin(), transitions.end(),

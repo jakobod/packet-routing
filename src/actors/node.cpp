@@ -19,27 +19,19 @@ namespace actors {
 behavior node_actor(stateful_actor<node_state>* self, id_type node_id,
                     seed_type seed, actor listener, actor parent,
                     routing::hyperparameters params, bool random) {
-  self->state.generator = std::mt19937(seed);
+  self->set_down_handler(
+    [=](const down_msg& msg) { self->state.remove_transition(msg.source); });
+
+  self->link_to(parent);
+
+  self->state.generator.seed(seed);
   self->state.node_id = node_id;
   self->state.load_weight = params.load_weight;
-  if (random)
-    self->state.routing_table = std::make_shared<routing::random>();
-  else
-    self->state.routing_table = std::make_shared<routing::ant>();
+  self->state.routing_table = random ? std::make_shared<routing::random>()
+                                     : self->state.routing_table
+                                       = std::make_shared<routing::ant>();
   self->state.routing_table->init(seed, params);
-  self->set_exit_handler([=](const exit_msg&) { self->quit(); });
-  self->link_to(parent);
-  self->delayed_send(self, 50ms, get_load_atom_v);
-  self->set_down_handler([=](const down_msg& msg) {
-    auto& transitions = self->state.transitions;
-    auto node_id = self->state.from_act(msg.source);
-    self->state.routing_table->delete_route(node_id);
-    transitions.erase(std::remove_if(begin(transitions), end(transitions),
-                                     [=](const auto& p) {
-                                       return p.first == msg.source;
-                                     }),
-                      end(transitions));
-  });
+  self->delayed_send(self, 100ms, get_load_atom_v);
   return {
     [=](register_transition_atom, actor trans, id_type node_id) {
       self->state.transitions.emplace_back(trans, node_id);
@@ -50,6 +42,7 @@ behavior node_actor(stateful_actor<node_state>* self, id_type node_id,
       self->state.routing_table->update(msg);
       ++self->state.message_count;
       if (msg.destination() == self->state.node_id) {
+        // Message was delivered correctly
         self->send(listener, message_delivered_atom_v, std::move(msg), true);
       } else {
         msg.update_path(self->state.node_id);
