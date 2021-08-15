@@ -25,8 +25,8 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
                           actor message_generator, actor listener,
                           routing::hyperparameters params, bool random,
                           bool log_graph) {
-  self->set_exit_handler([=](const exit_msg&) { self->quit(); });
-  self->link_to(listener);
+  self->set_down_handler([=](const down_msg&) { self->quit(); });
+  self->monitor(listener);
 
   return {
     [=](generate_atom, size_t num_nodes, size_t num_transitions,

@@ -19,9 +19,11 @@ namespace actors {
 behavior node(stateful_actor<node_state>* self, id_type node_id, seed_type seed,
               actor listener, actor parent, routing::hyperparameters params,
               bool random) {
-  self->set_down_handler(
-    [=](const down_msg& msg) { self->state.remove_transition(msg.source); });
-  self->link_to(parent);
+  self->set_down_handler([=](const down_msg& msg) {
+    msg.source == parent ? self->quit()
+                         : self->state.remove_transition(msg.source);
+  });
+  self->monitor(parent);
   self->state.generator.seed(seed);
   self->state.node_id = node_id;
   self->state.load_weight = params.load_weight;
