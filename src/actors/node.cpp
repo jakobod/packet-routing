@@ -20,8 +20,13 @@ behavior node(stateful_actor<node_state>* self, id_type node_id, seed_type seed,
               actor listener, actor parent, routing::hyperparameters params,
               bool random) {
   self->set_down_handler([=](const down_msg& msg) {
-    msg.source == parent ? self->quit()
-                         : self->state.remove_transition(msg.source);
+    if (msg.source == parent) {
+      self->quit();
+    } else {
+      self->state.remove_transition(msg.source);
+      if (self->state.transitions.empty())
+        self->quit();
+    }
   });
   self->monitor(parent);
   self->state.generator.seed(seed);

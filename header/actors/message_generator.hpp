@@ -21,6 +21,11 @@ struct message_generator_state {
   std::vector<caf::actor> nodes;
   std::mt19937 gen;
   size_t num_messages = 0;
+
+  template <class Node>
+  void remove_node(const Node& node) {
+    nodes.erase(std::remove(nodes.begin(), nodes.end(), node), nodes.end());
+  }
 };
 
 caf::behavior

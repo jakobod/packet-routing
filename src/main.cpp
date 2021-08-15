@@ -14,6 +14,7 @@
 #include "type_ids.hpp"
 
 using namespace caf;
+using namespace std::literals::chrono_literals;
 
 namespace {
 
@@ -32,7 +33,9 @@ struct config : actor_system_config {
            "Evaporation coefficient of pheromones")
       .add(alpha, "alpha,a", "Controls the influence of the pheromones")
       .add(beta, "beta,b", "Controls the influence of the path weight")
-      .add(load_weight, "load_weight,l", "Controls Weight of load");
+      .add(load_weight, "load_weight,l", "Controls Weight of load")
+      .add(change_rate, "change_rate,c",
+           "Defines the wait time between changes");
 
     opt_group{custom_options_, "logging"}
       .add(message_log_path, "message-log-path",
@@ -48,6 +51,7 @@ struct config : actor_system_config {
   size_t num_nodes = 1;
   size_t num_transitions = 1;
   seed_type seed = 0;
+  std::chrono::milliseconds change_rate = 100ms;
   // Hyperparameters (learning)
   double pheromone_deposition = 1;
   double pheromone_evaporation = 0.5;
@@ -70,9 +74,8 @@ void caf_main(actor_system& sys, const config& args) {
                 routing::hyperparameters{args.pheromone_deposition,
                                          args.pheromone_evaporation, args.alpha,
                                          args.beta, args.load_weight},
-                args.random);
-  self->send(tm, generate_atom_v, args.num_nodes, args.num_transitions,
-             args.seed);
+                args.seed, args.random, args.change_rate);
+  self->send(tm, generate_atom_v, args.num_nodes, args.num_transitions);
 }
 
 } // namespace

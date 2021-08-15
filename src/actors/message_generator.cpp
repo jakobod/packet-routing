@@ -12,6 +12,8 @@ namespace actors {
 
 behavior message_generator(stateful_actor<message_generator_state>* self,
                            seed_type seed, size_t num_messages) {
+  self->set_down_handler(
+    [=](const down_msg& msg) { self->state.remove_node(msg.source); });
   self->state.gen.seed(seed);
   return {
     [=](generate_message_atom) {
@@ -29,12 +31,9 @@ behavior message_generator(stateful_actor<message_generator_state>* self,
       if (++self->state.num_messages >= num_messages)
         self->quit();
     },
-    [=](remove_node_atom, const actor& node) {
-      self->state.nodes.erase(std::remove(self->state.nodes.begin(),
-                                          self->state.nodes.end(), node),
-                              self->state.nodes.end());
-    },
+    [=](remove_node_atom, const actor& node) { self->state.remove_node(node); },
     [=](add_node_atom, const actor& node) {
+      self->monitor(node);
       self->state.nodes.push_back(node);
     },
   };
