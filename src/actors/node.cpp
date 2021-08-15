@@ -21,9 +21,7 @@ behavior node(stateful_actor<node_state>* self, id_type node_id, seed_type seed,
               bool random) {
   self->set_down_handler(
     [=](const down_msg& msg) { self->state.remove_transition(msg.source); });
-
   self->link_to(parent);
-
   self->state.generator.seed(seed);
   self->state.node_id = node_id;
   self->state.load_weight = params.load_weight;
@@ -31,7 +29,6 @@ behavior node(stateful_actor<node_state>* self, id_type node_id, seed_type seed,
                                      : self->state.routing_table
                                        = std::make_shared<routing::ant>();
   self->state.routing_table->init(seed, params);
-  // self->delayed_send(self, 100ms, get_load_atom_v);
   return {
     [=](register_transition_atom, actor trans, id_type node_id) {
       self->state.transitions.emplace_back(trans, node_id);

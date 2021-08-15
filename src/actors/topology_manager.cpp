@@ -6,6 +6,8 @@
 
 #include "actors/topology_manager.hpp"
 
+#include <chrono>
+
 #include "actors/node.hpp"
 #include "actors/transition.hpp"
 #include "caf/actor_ostream.hpp"
@@ -15,6 +17,7 @@
 #include "type_ids.hpp"
 
 using namespace caf;
+using namespace std::literals::chrono_literals;
 
 namespace actors {
 
@@ -36,11 +39,12 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
       aout(self) << "[topo] Generated graph. Written to graph.log."
                  << std::endl;
       aout(self) << "[topo] Adding nodes" << std::endl;
-      for (const auto& node : graph::get_nodes(g)) {
-        auto node_ref = self->spawn(actors::node, node, seed, listener, self,
-                                    params, random);
-        self->send(message_generator, add_node_atom_v, node_ref);
-        self->state.nodes.emplace(node, std::move(node_ref));
+      for (const auto& node_id : graph::get_nodes(g)) {
+        auto node = self->spawn(actors::node, node_id, seed, listener, self,
+                                params, random);
+        self->delayed_send(node, 100ms, get_load_atom_v);
+        self->send(message_generator, add_node_atom_v, node);
+        self->state.nodes.emplace(node_id, std::move(node));
       }
       aout(self) << "[topo] Adding transitions" << std::endl;
       for (const auto& trans : graph::get_transitions(g)) {
