@@ -22,7 +22,7 @@ CAF_TEST(simple initialization) {
   CAF_CHECK_EQUAL(msg.id(), id_type{1});
   CAF_CHECK_EQUAL(msg.source(), id_type{2});
   CAF_CHECK_EQUAL(msg.destination(), id_type{3});
-  CAF_CHECK_EQUAL(msg.last_weight(), weight_type{0});
+  CAF_CHECK_EQUAL(msg.last_weight(), weight_type{1});
   CAF_CHECK_EQUAL(msg.path().size(), size_t{0});
 }
 

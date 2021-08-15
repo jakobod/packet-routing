@@ -17,9 +17,8 @@ struct transition_state {
   size_t received_dones = 0;
 };
 
-caf::behavior transition_actor(caf::stateful_actor<transition_state>* self,
-                               node_pair node_1, node_pair node_2,
-                               caf::actor parent, weight_type weight,
-                               caf::actor listener);
+caf::behavior transition(caf::stateful_actor<transition_state>* self,
+                         node_pair node_1, node_pair node_2, caf::actor parent,
+                         weight_type weight, caf::actor listener);
 
 } // namespace actors

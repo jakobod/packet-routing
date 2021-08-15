@@ -11,11 +11,13 @@ using namespace caf;
 
 namespace actors {
 
-behavior transition_actor(caf::stateful_actor<transition_state>* self,
-                          node_pair node_1, node_pair node_2, caf::actor parent,
-                          weight_type weight, caf::actor) {
-  self->set_exit_handler([=](const exit_msg&) { self->quit(); });
-  self->link_to(parent);
+behavior transition(caf::stateful_actor<transition_state>* self,
+                    node_pair node_1, node_pair node_2, caf::actor parent,
+                    weight_type weight, caf::actor) {
+  self->set_down_handler([=](const down_msg&) { self->quit(); });
+  self->monitor(parent);
+  self->monitor(node_1.first);
+  self->monitor(node_2.first);
   self->send(node_1.first, register_transition_atom_v, self, node_2.second);
   self->send(node_2.first, register_transition_atom_v, self, node_1.second);
   self->state.weight = weight;

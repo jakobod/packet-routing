@@ -19,7 +19,7 @@ void ant::init(seed_type seed, hyperparameters params) {
 
 void ant::update(const message& msg) {
   // Update every goal in the hop list
-  for (const auto& index : msg.path()) {
+  for (auto index : msg.path()) {
     auto [it, success] = routes_.emplace(index, entry_list());
     auto& entry_l = it->second;
     for (auto& e : entry_l)

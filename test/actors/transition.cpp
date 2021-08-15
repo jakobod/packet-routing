@@ -6,6 +6,8 @@
 
 #include <utility>
 
+#include "actors/node.hpp"
+#include "routing/hyperparameters.hpp"
 #include "routing/message.hpp"
 #include "type_ids.hpp"
 #include "types.hpp"
@@ -24,7 +26,7 @@ struct fixture : test_coordinator_fixture<> {
       node_2{sys},
       parent{sys},
       listener{sys},
-      trans{sys.spawn(actors::transition_actor,
+      trans{sys.spawn(actors::transition,
                       std::make_pair(actor_cast<actor>(node_1), node_1_id),
                       std::make_pair(actor_cast<actor>(node_2), node_2_id),
                       parent, trans_weight, listener)} {
@@ -73,6 +75,21 @@ CAF_TEST(forward message) {
   run();
   expect((message_atom, routing::message), from(trans).to(node_2).with(_, _));
   expect((message_atom, routing::message), from(trans).to(node_1).with(_, _));
+}
+
+CAF_TEST(quit on down_msg) {
+  routing::hyperparameters params{1.0, 2.0, 3.0, 4.0, 5.0};
+  CAF_MESSAGE("Spawning two nodes and a transition");
+  auto node_1 = sys.spawn(actors::node, 1, 1, self, self, params, true);
+  auto node_2 = sys.spawn(actors::node, 2, 1, self, self, params, true);
+  auto trans = sys.spawn(actors::transition, std::make_pair(node_1, 1),
+                         std::make_pair(node_2, 2), self, 1, self);
+  self->monitor(trans);
+  run();
+  expect((done_atom), from(trans).to(self).with(_));
+  self->send_exit(node_1, exit_reason::kill);
+  run();
+  expect((down_msg), from(trans).to(self).with(_));
 }
 
 CAF_TEST_FIXTURE_SCOPE_END()

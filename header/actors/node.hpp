@@ -61,8 +61,8 @@ struct node_state {
   }
 };
 
-caf::behavior node_actor(caf::stateful_actor<node_state>* self, id_type node_id,
-                         seed_type seed, caf::actor listener, caf::actor parent,
-                         routing::hyperparameters params, bool random);
+caf::behavior node(caf::stateful_actor<node_state>* self, id_type node_id,
+                   seed_type seed, caf::actor listener, caf::actor parent,
+                   routing::hyperparameters params, bool random);
 
 } // namespace actors

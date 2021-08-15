@@ -18,7 +18,7 @@ message::message(id_type id, id_type source, id_type destination)
   : id_(id),
     source_(source),
     destination_(destination),
-    last_weight_(0),
+    last_weight_(1),
     time_created_(
       duration_cast<milliseconds>(steady_clock::now().time_since_epoch())) {
 }
