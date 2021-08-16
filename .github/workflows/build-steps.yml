@@ -34,14 +34,6 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-    - name: Install Boost
-      run: |
-        if [ "$(uname)" == "Darwin" ]; then
-          brew install boost
-        elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-          sudo apt install -y libboost-graph-dev
-        fi
-
     - name: Configure
       run: ./configure --build-type=${{ matrix.config.build_type }}
 
