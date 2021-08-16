@@ -26,6 +26,7 @@ behavior benchmarker(stateful_actor<benchmarker_state>* self,
                      [[maybe_unused]] seed_type seed, size_t num_nodes,
                      size_t num_messages, std::string message_log_path,
                      std::string load_log_path) {
+  aout(self) << "[benchmarker] has id = " << self->id() << std::endl;
   self->set_default_handler(drop);
   self->state.loads.resize(num_nodes);
   return {
@@ -56,7 +57,12 @@ behavior benchmarker(stateful_actor<benchmarker_state>* self,
       }
     },
     [=](share_load_atom, load_type current_load, id_type id) {
-      self->state.loads.at(id).push_back(current_load);
+      // Disabled until rework is done. Adding new nodes with new node_ids
+      // introduces segfaults at this call.
+      // aout(self) << "[benchmarker] share
+      // load. Access at " << id
+      //            << " size() = " << self->state.loads.size() << std::endl;
+      // self->state.loads.at(id).push_back(current_load);
     },
   };
 }

@@ -28,6 +28,7 @@ static constexpr uint8_t add_transition = 2;
 static constexpr uint8_t remove_transition = 3;
 
 struct topology_manager_state {
+  static const char* name;
   size_t num_transitions = 0;
   size_t next_node_id = 0;
   std::vector<node_pair> nodes;

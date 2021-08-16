@@ -9,12 +9,18 @@
 
 #include "routing/ant.hpp"
 #include "routing/message.hpp"
+#include "types.hpp"
 
 namespace routing {
 
 void ant::init(seed_type seed, hyperparameters params) {
   this->gen.seed(seed);
   params_ = params;
+}
+
+void ant::add_new_transition(id_type node_id, weight_type weight) {
+  auto [it, success] = routes_.emplace(node_id, entry_list{});
+  it->second.emplace_back(node_id, params_, weight);
 }
 
 void ant::update(const message& msg) {
@@ -31,9 +37,7 @@ void ant::update(const message& msg) {
         to_update != entry_l.end()) {
       to_update->update(msg.last_weight());
     } else {
-      routing::entry e{msg.path().back(), params_};
-      e.update(msg.last_weight());
-      entry_l.emplace_back(e);
+      entry_l.emplace_back(msg.path().back(), params_, msg.last_weight());
     }
   }
 }

@@ -27,6 +27,8 @@ public:
 
   // -- public API -------------------------------------------------------------
 
+  virtual void add_new_transition(id_type node_id, weight_type weight) = 0;
+
   virtual void update(const message& msg) = 0;
 
   virtual void delete_route(id_type node_id) = 0;

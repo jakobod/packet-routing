@@ -14,6 +14,10 @@ void random::init(seed_type, hyperparameters) {
   // nop
 }
 
+void random::add_new_transition(id_type, weight_type) {
+  // nop
+}
+
 void random::update(const message&) {
   // nop
 }

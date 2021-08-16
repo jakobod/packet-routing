@@ -10,8 +10,10 @@
 
 namespace routing {
 
-entry::entry(id_type next_hop, hyperparameters params)
-  : next_hop(next_hop),
+entry::entry(id_type next_hop, hyperparameters params, weight_type weight)
+  : pheromones(params.pheromone_deposition),
+    weight(weight),
+    next_hop(next_hop),
     alpha(params.alpha),
     beta(params.beta),
     pheromone_evaporation(params.pheromone_evaporation),

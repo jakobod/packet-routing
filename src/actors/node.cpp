@@ -16,6 +16,8 @@ using namespace std::chrono_literals;
 
 namespace actors {
 
+const char* node_state::name = "node";
+
 behavior node(stateful_actor<node_state>* self, id_type node_id, seed_type seed,
               actor listener, actor parent, routing::hyperparameters params,
               bool random) {
@@ -37,8 +39,10 @@ behavior node(stateful_actor<node_state>* self, id_type node_id, seed_type seed,
                                        = std::make_shared<routing::ant>();
   self->state.routing_table->init(seed, params);
   return {
-    [=](register_transition_atom, actor trans, id_type node_id) {
+    [=](register_transition_atom, actor trans, weight_type weight,
+        id_type node_id) {
       self->state.transitions.emplace_back(trans, node_id);
+      self->state.routing_table->add_new_transition(node_id, weight);
       self->monitor(trans);
       return done_atom_v;
     },

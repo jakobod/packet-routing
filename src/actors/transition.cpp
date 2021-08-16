@@ -11,6 +11,8 @@ using namespace caf;
 
 namespace actors {
 
+const char* transition_state::name = "transition";
+
 behavior transition(caf::stateful_actor<transition_state>* self,
                     node_pair node_1, node_pair node_2, caf::actor parent,
                     weight_type weight, caf::actor) {
@@ -18,8 +20,10 @@ behavior transition(caf::stateful_actor<transition_state>* self,
   self->monitor(parent);
   self->monitor(node_1.first);
   self->monitor(node_2.first);
-  self->send(node_1.first, register_transition_atom_v, self, node_2.second);
-  self->send(node_2.first, register_transition_atom_v, self, node_1.second);
+  self->send(node_1.first, register_transition_atom_v, self, weight,
+             node_2.second);
+  self->send(node_2.first, register_transition_atom_v, self, weight,
+             node_1.second);
   self->state.weight = weight;
 
   return {

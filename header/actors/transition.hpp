@@ -13,6 +13,7 @@
 namespace actors {
 
 struct transition_state {
+  static const char* name;
   weight_type weight = 0;
   size_t received_dones = 0;
 };

@@ -1,5 +1,6 @@
 #include "actors/message_generator.hpp"
 
+#include "caf/actor_ostream.hpp"
 #include "caf/event_based_actor.hpp"
 #include "caf/fwd.hpp"
 #include "routing/message.hpp"
@@ -10,10 +11,15 @@ using namespace caf;
 
 namespace actors {
 
+const char* message_generator_state::name = "message_generator";
+
 behavior message_generator(stateful_actor<message_generator_state>* self,
                            seed_type seed, size_t num_messages) {
-  self->set_down_handler(
-    [=](const down_msg& msg) { self->state.remove_node(msg.source); });
+  aout(self) << "[message_generator] has id = " << self->id() << std::endl;
+  self->set_down_handler([=](const down_msg& msg) {
+    aout(self) << "[message_generator] Removing node" << std::endl;
+    self->state.remove_node(msg.source);
+  });
   self->state.gen.seed(seed);
   return {
     [=](generate_message_atom) {

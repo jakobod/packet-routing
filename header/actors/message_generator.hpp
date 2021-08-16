@@ -18,6 +18,7 @@
 namespace actors {
 
 struct message_generator_state {
+  static const char* name;
   std::vector<caf::actor> nodes;
   std::mt19937 gen;
   size_t num_messages = 0;

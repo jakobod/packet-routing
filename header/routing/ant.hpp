@@ -26,6 +26,8 @@ public:
 
   void init(seed_type seed, hyperparameters params) override;
 
+  void add_new_transition(id_type node_id, weight_type weight) override;
+
   void update(const message& msg) override;
 
   void delete_route(id_type node_id) override;

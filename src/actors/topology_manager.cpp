@@ -22,16 +22,13 @@ using namespace std::literals::chrono_literals;
 
 namespace actors {
 
-/*
-  TODO:
-  Add transitions to vector and monitor them
-  each time a transition is down, remove it from the list.!
-*/
+const char* topology_manager_state::name = "topology_manager";
 
 behavior topology_manager(stateful_actor<topology_manager_state>* self,
                           actor message_generator, actor listener,
                           routing::hyperparameters params, seed_type seed,
                           bool random, std::chrono::milliseconds change_rate) {
+  aout(self) << "[topo] has id = " << self->id() << std::endl;
   self->set_down_handler([=](const down_msg& msg) {
     msg.source == listener ? self->quit()
                            : self->state.remove(self, msg.source);
@@ -73,10 +70,11 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
     [=](change_topology_atom) {
       std::bernoulli_distribution d(0.5);
       if (d(self->state.gen)) {
+        std::cerr << "[topo] ADDING node" << std::endl;
         auto& gen = self->state.gen;
         auto node_id = self->state.next_node_id++;
-        aout(self) << "[topo] Adding node " << node_id << std::endl;
         // Spawn and setup the new node
+        aout(self) << "[topo] Adding node " << node_id << std::endl;
         auto node = self->spawn(actors::node, node_id, seed, listener, self,
                                 params, random);
         self->monitor(node);
@@ -100,21 +98,24 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
           transitions.emplace(std::move(new_transition));
         }
         for (auto& trans : transitions) {
-          aout(self) << "[topo] spawning transition with indexes = "
-                     << trans.node_1 << " and " << trans.node_2
-                     << " with size() = " << self->state.nodes.size()
-                     << std::endl;
+          std::cerr << "[topo] spawning transition with indexes = "
+                    << trans.node_1 << " and " << trans.node_2
+                    << " with size() = " << self->state.nodes.size()
+                    << std::endl;
           self->spawn(actors::transition, self->state.nodes.at(trans.node_1),
                       self->state.nodes.at(trans.node_2), self, trans.weight,
                       listener);
         }
         self->send(message_generator, add_node_atom_v, std::move(node));
       } else {
+        std::cerr << "[topo] REMOVING node" << std::endl;
         std::uniform_int_distribution<size_t> dist(0, self->state.nodes.size()
                                                         - 1);
         auto index = dist(self->state.gen);
+        std::cerr << "[topo] Going to remove node from index = " << index
+                  << std::endl;
         auto& p = self->state.nodes.at(index);
-        aout(self) << "[topo] Removing node " << p.second << std::endl;
+        std::cerr << "[topo] Removing node " << p.second << std::endl;
         self->send_exit(p.first, exit_reason::kill);
       }
       self->delayed_send(self, change_rate, change_topology_atom_v);

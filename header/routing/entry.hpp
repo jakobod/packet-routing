@@ -16,7 +16,7 @@ namespace routing {
 struct entry {
   // -- Constructors -----------------------------------------------------------
 
-  entry(id_type next_hop, hyperparameters params);
+  entry(id_type next_hop, hyperparameters params, weight_type weight);
 
   // -- public API -------------------------------------------------------------
 
