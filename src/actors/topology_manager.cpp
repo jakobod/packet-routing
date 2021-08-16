@@ -33,7 +33,8 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
                           routing::hyperparameters params, seed_type seed,
                           bool random, std::chrono::milliseconds change_rate) {
   self->set_down_handler([=](const down_msg& msg) {
-    msg.source == listener ? self->quit() : self->state.remove_node(msg.source);
+    msg.source == listener ? self->quit()
+                           : self->state.remove(self, msg.source);
   });
   self->state.gen.seed(seed);
   self->monitor(listener);
@@ -60,9 +61,10 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
       }
       aout(self) << "[topo] Spawning transitions" << std::endl;
       for (const auto& trans : graph.transitions()) {
-        self->spawn(actors::transition, self->state.nodes.at(trans.node_1),
-                    self->state.nodes.at(trans.node_2), self, trans.weight,
-                    listener);
+        self->state.transitions.emplace_back(self->spawn(
+          actors::transition, self->state.nodes.at(trans.node_1),
+          self->state.nodes.at(trans.node_2), self, trans.weight, listener));
+        self->monitor(self->state.transitions.back());
       }
       aout(self) << "[topo] Finished building graph with "
                  << graph.num_transitions() << " transitions and "
@@ -82,7 +84,7 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
         self->state.nodes.emplace_back(node, node_id);
         // Randomly pick some other nodes and spawn some transitions
         std::uniform_int_distribution<size_t> num_transitions_dist(
-          1, self->state.num_transitions);
+          1, (self->state.num_transitions - self->state.transitions.size()));
         std::uniform_int_distribution<size_t> weight_dist(1, 100);
         // Exclude the new node at the end
         std::uniform_int_distribution<size_t> node_index_dist(
@@ -97,19 +99,23 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
                                            weight_dist(gen)};
           transitions.emplace(std::move(new_transition));
         }
-        for (auto& trans : transitions)
+        for (auto& trans : transitions) {
+          aout(self) << "[topo] spawning transition with indexes = "
+                     << trans.node_1 << " and " << trans.node_2
+                     << " with size() = " << self->state.nodes.size()
+                     << std::endl;
           self->spawn(actors::transition, self->state.nodes.at(trans.node_1),
                       self->state.nodes.at(trans.node_2), self, trans.weight,
                       listener);
+        }
         self->send(message_generator, add_node_atom_v, std::move(node));
       } else {
-        std::uniform_int_distribution<size_t> dist(0, self->state.nodes.size());
+        std::uniform_int_distribution<size_t> dist(0, self->state.nodes.size()
+                                                        - 1);
         auto index = dist(self->state.gen);
         auto& p = self->state.nodes.at(index);
         aout(self) << "[topo] Removing node " << p.second << std::endl;
-        auto& to_remove = p.first;
-        self->send_exit(to_remove, exit_reason::kill);
-        self->state.remove_node(index);
+        self->send_exit(p.first, exit_reason::kill);
       }
       self->delayed_send(self, change_rate, change_topology_atom_v);
     },

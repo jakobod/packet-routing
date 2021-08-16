@@ -10,8 +10,16 @@ Usage:
   $0 [--<variable>=<value>...]
 
 General CMake options:
+  --cmake=PATH              set a custom path to the CMake binary
   --build-dir=PATH          set build directory [build]
   --build-type=STRING       set build type of single-configuration generators
+  --generator=STRING        set CMake generator (see cmake --help)
+  --cxx-flags=STRING        set CMAKE_CXX_FLAGS when running CMake
+  --prefix=PATH             set installation directory
+
+Locating packages in non-standard locations:
+
+  --with-caf=PATH           use a local CAF version instead of fetching a tag
 
 Debugging options:
   --log-level=STRING      build with debugging output, possible values:
@@ -21,6 +29,15 @@ Debugging options:
                             - DEBUG
                             - TRACE
   --sanitizers=STRING     build with this list of sanitizers enabled
+
+Flags (use --enable-<name> to activate and --disable-<name> to deactivate):
+  shared-libs               build shared library targets [ON]
+  export-compile-commands   write JSON compile commands database [ON]
+  prefer-pthread-flag       prefer -pthread flag if available  [ON]
+  runtime-checks            build CAF with extra runtime assertions [OFF]
+  utility-targets           include targets like consistency-check [OFF]
+  actor-profiler            enable experimental proiler API [OFF]
+  with-exceptions           build CAF with support for exceptions [ON]
 
 Influential Environment Variables (only on first invocation):
   CXX                       C++ compiler command
@@ -46,7 +63,20 @@ append_cache_entry() {
 }
 
 # Appends a BOOL cache entry to the CMakeCacheEntries variable.
+#   $1: flag name
+#   $2: value (ON or OFF)
 set_build_flag() {
+  FlagName=''
+  case "$1" in
+    shared-libs)             FlagName='BUILD_SHARED_LIBS' ;;
+    export-compile-commands) FlagName='CMAKE_EXPORT_COMPILE_COMMANDS' ;;
+    prefer-pthread-flag)     FlagName='THREADS_PREFER_PTHREAD_FLAG' ;;
+    exceptions)              FlagName='CAF_ENABLE_EXCEPTIONS' ;;
+    *)
+      echo "Invalid flag '$1'.  Try $0 --help to see available options."
+      exit 1
+      ;;
+  esac
   append_cache_entry $FlagName BOOL $2
 }
 
@@ -57,23 +87,58 @@ CMakeCacheEntries=""
 # Parse user input.
 while [ $# -ne 0 ]; do
   # Fetch the option argument.
+  case "$1" in
+    --*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    --enable-*) optarg=`echo "$1" | sed 's/--enable-//'` ;;
+    --disable-*) optarg=`echo "$1" | sed 's/--disable-//'` ;;
+    *) ;;
+  esac
   # Consume current input.
   case "$1" in
     --help|-h)
       echo "${usage}" 1>&2
       exit 1
       ;;
+    --cmake=*)
+      CMakeCommand="$optarg"
+      ;;
     --build-dir=*)
       CMakeBuildDir="$optarg"
       ;;
+    --generator=*)
+      CMakeGenerator="$optarg"
+      ;;
+    --tag=*)
+      tag="$optarg"
+      append_cache_entry CAF_TAG STRING "$tag"
+      ;;
+    --with-caf=*)
+      tag="local"
+      append_cache_entry CAF_ROOT PATH "$optarg"
+      ;;
     --build-type=*)
       append_cache_entry CMAKE_BUILD_TYPE STRING "$optarg"
+      ;;
+    --cxx-flags=*)
+      append_cache_entry CMAKE_CXX_FLAGS STRING "$optarg"
+      ;;
+    --prefix=*)
+      append_cache_entry CMAKE_INSTALL_PREFIX PATH "$optarg"
       ;;
     --log-level=*)
       append_cache_entry CAF_LOG_LEVEL STRING "$optarg"
       ;;
     --sanitizers=*)
       append_cache_entry SANITIZERS STRING "$optarg"
+      ;;
+    --enable-*)
+      set_build_flag $optarg ON
+      ;;
+    --disable-*)
+      set_build_flag $optarg OFF
+      ;;
+    --openssl-root-dir=*)
+      append_cache_entry OPENSSL_ROOT_DIR PATH "$optarg"
       ;;
     *)
       echo "Invalid option '$1'. Try $0 --help to see available options."
