@@ -30,27 +30,20 @@ struct topology_manager_state {
   size_t initialized_transitions = 0;
   std::mt19937 gen;
 
+  bool is_initialized() {
+    return ++initialized_transitions == num_transitions;
+  }
+
   void remove(size_t index) {
     nodes.erase(nodes.begin() + index);
   }
 
-  void remove(caf::stateful_actor<topology_manager_state>* self,
-              const caf::actor_addr& addr) {
-    // Actor should only be present in one of both lists. We don't know if an
-    // actor is a node or a transition on shutdown, hence we try to remove the
-    // actor from both lists.
-    if (auto it
-        = std::remove_if(nodes.begin(), nodes.end(),
-                         [=](const auto& p) { return p.first == addr; });
-        it != nodes.end()) {
-      nodes.erase(it, nodes.end());
-      caf::aout(self) << "[topo] Removed node" << std::endl;
-    } else {
-      transitions.erase(std::remove(transitions.begin(), transitions.end(),
-                                    addr),
-                        transitions.end());
-      caf::aout(self) << "[topo] Removed transition" << std::endl;
-    }
+  void remove(const caf::actor_addr& addr) {
+    nodes.erase(std::remove_if(nodes.begin(), nodes.end(),
+                               [=](const auto& p) { return p.first == addr; }),
+                nodes.end());
+    transitions.erase(std::remove(transitions.begin(), transitions.end(), addr),
+                      transitions.end());
   }
 };
 

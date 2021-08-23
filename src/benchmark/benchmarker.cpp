@@ -26,7 +26,6 @@ behavior benchmarker(stateful_actor<benchmarker_state>* self,
                      [[maybe_unused]] seed_type seed, size_t num_nodes,
                      size_t num_messages, std::string message_log_path,
                      std::string load_log_path) {
-  aout(self) << "[benchmarker] has id = " << self->id() << std::endl;
   self->set_default_handler(drop);
   self->state.loads.resize(num_nodes);
   self->state.expected_messages = num_messages;
@@ -34,27 +33,26 @@ behavior benchmarker(stateful_actor<benchmarker_state>* self,
   self->state.load_log_path = load_log_path;
   auto print_progress = [=]() {
     auto delivered_msgs = self->state.results.size();
-    if ((delivered_msgs % 100) == 0)
+    if ((delivered_msgs % 1000) == 0)
       aout(self) << "[benchmarker] received " << delivered_msgs << std::endl;
+  };
+  auto check_done = [=](bool done) {
+    if (done) {
+      self->state.save_messages();
+      self->state.save_load();
+      self->quit();
+    }
   };
   return {
     [=](message_delivered_atom, routing::message& msg) {
       auto done = self->state.log_message(msg, true);
       print_progress();
-      if (done) {
-        self->state.save_messages();
-        self->state.save_load();
-        self->quit();
-      }
+      check_done(done);
     },
     [=](message_dropped_atom, routing::message& msg) {
       auto done = self->state.log_message(msg, false);
       print_progress();
-      if (done) {
-        self->state.save_messages();
-        self->state.save_load();
-        self->quit();
-      }
+      check_done(done);
     },
     [=](share_load_atom, load_type current_load, id_type id) {
       // Disabled until rework is done. Adding new nodes with new node_ids

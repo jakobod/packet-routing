@@ -17,11 +17,9 @@ behavior message_generator(stateful_actor<message_generator_state>* self,
                            caf::actor listener, seed_type seed,
                            size_t num_messages,
                            std::chrono::milliseconds drop_timeout) {
-  aout(self) << "[message_generator] has id = " << self->id() << std::endl;
-  self->set_down_handler([=](const down_msg& msg) {
-    aout(self) << "[message_generator] Removing node" << std::endl;
-    self->state.remove_node(msg.source);
-  });
+  self->set_down_handler(
+    [=](const down_msg& msg) { self->state.remove_node(msg.source); });
+  self->link_to(listener);
   self->state.gen.seed(seed);
   return {
     [=](generate_message_atom) {
@@ -37,9 +35,8 @@ behavior message_generator(stateful_actor<message_generator_state>* self,
         self->delayed_send(listener, drop_timeout, message_dropped_atom_v,
                            std::move(msg));
       }
-      self->send(self, generate_message_atom_v);
-      if (++self->state.num_messages >= num_messages)
-        self->quit();
+      if (++self->state.num_messages < num_messages)
+        self->delayed_send(self, 100ns, generate_message_atom_v);
     },
     [=](remove_node_atom, const actor& node) { self->state.remove_node(node); },
     [=](add_node_atom, const actor& node) {
