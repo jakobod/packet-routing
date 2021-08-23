@@ -20,7 +20,8 @@ struct fixture : test_coordinator_fixture<> {
 CAF_TEST_FIXTURE_SCOPE(message_generator_tests, fixture)
 
 CAF_TEST(generate 100 messages) {
-  auto gen = sys.spawn(actors::message_generator, 0, 100);
+  using namespace std::literals::chrono_literals;
+  auto gen = sys.spawn(actors::message_generator, self, 0, 100, 30s);
   CAF_MESSAGE("Adding self as node twice");
   self->send(gen, add_node_atom_v, self);
   self->send(gen, add_node_atom_v, self);

@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <fstream>
@@ -25,13 +26,38 @@
 namespace benchmark {
 
 struct benchmarker_state {
-  size_t delivered_messages = 0;
-  std::vector<result> results;
+  size_t expected_messages = 0;
+  result_set results;
   std::vector<std::vector<id_type>> loads;
-  std::ofstream load_csv;
+  std::string msg_log_path;
+  std::string load_log_path;
 
-  void save_load(const std::string& path) {
-    std::ofstream load_os(path);
+  /// Adds a received message to the message log
+  /// @return `true` if all messages have been received, `false` otherwise
+  bool log_message(routing::message& msg, bool success) {
+    using namespace std::chrono;
+    auto now = steady_clock::now().time_since_epoch();
+    auto diff = now - msg.time_created();
+    auto duration = duration_cast<milliseconds>(diff);
+    results.emplace(msg.id(), msg.time_created(),
+                    duration_cast<milliseconds>(now), std::move(msg.path()),
+                    duration, success);
+    return (results.size() >= expected_messages);
+  }
+
+  void save_messages() {
+    std::ofstream os(msg_log_path);
+    os << "msg_id,time_created,time_received,path_length,duration,arrived"
+       << std::endl;
+    result_list res(results.begin(), results.end());
+    std::sort(res.begin(), res.end(),
+              [](const auto& a, const auto& b) { return a.msg_id < b.msg_id; });
+    for (const auto& res : res)
+      os << res << std::endl;
+  }
+
+  void save_load() {
+    std::ofstream load_os(load_log_path);
     load_os << "time,";
     for (size_t i = 0; i < loads.size(); ++i)
       load_os << "node_" << std::to_string(i) << ",";
@@ -46,14 +72,6 @@ struct benchmarker_state {
         load_os << loads[x][y] << ",";
       load_os << std::endl;
     }
-  }
-
-  void save_messages(const std::string& path) {
-    std::ofstream os(path);
-    os << "msg_id,time_created,time_received,path_length,duration,arrived"
-       << std::endl;
-    for (const auto& res : results)
-      os << res << std::endl;
   }
 };
 

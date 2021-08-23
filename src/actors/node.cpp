@@ -16,8 +16,6 @@ using namespace std::chrono_literals;
 
 namespace actors {
 
-const char* node_state::name = "node";
-
 behavior node(stateful_actor<node_state>* self, id_type node_id, seed_type seed,
               actor listener, actor parent, routing::hyperparameters params,
               bool random) {
@@ -51,7 +49,7 @@ behavior node(stateful_actor<node_state>* self, id_type node_id, seed_type seed,
       ++self->state.message_count;
       if (msg.destination() == self->state.node_id) {
         // Message was delivered correctly
-        self->send(listener, message_delivered_atom_v, std::move(msg), true);
+        self->send(listener, message_delivered_atom_v, std::move(msg));
       } else {
         msg.update_path(self->state.node_id);
         auto index = self->state.routing_table->get_route(msg.destination());
@@ -71,8 +69,7 @@ behavior node(stateful_actor<node_state>* self, id_type node_id, seed_type seed,
             }
           }
           if (!sent_message)
-            self->send(listener, message_delivered_atom_v, std::move(msg),
-                       false);
+            self->send(listener, message_dropped_atom_v, std::move(msg));
         } else {
           auto trans = self->state.from_id(index);
           self->delayed_send(

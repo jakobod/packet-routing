@@ -33,9 +33,11 @@ struct config : actor_system_config {
            "Evaporation coefficient of pheromones")
       .add(alpha, "alpha,a", "Controls the influence of the pheromones")
       .add(beta, "beta,b", "Controls the influence of the path weight")
-      .add(load_weight, "load_weight,l", "Controls Weight of load")
-      .add(change_rate, "change_rate,c",
-           "Defines the wait time between changes");
+      .add(load_weight, "load-weight,l", "Controls Weight of load")
+      .add(change_rate, "change-rate,c",
+           "Defines the wait time between changes")
+      .add(drop_timeout, "drop-timeout",
+           "Defines the time after which messages are dropped");
 
     opt_group{custom_options_, "logging"}
       .add(message_log_path, "message-log-path",
@@ -52,6 +54,7 @@ struct config : actor_system_config {
   size_t num_transitions = 1;
   seed_type seed = 0;
   std::chrono::milliseconds change_rate = 100ms;
+  std::chrono::milliseconds drop_timeout = 30s;
   // Hyperparameters (learning)
   double pheromone_deposition = 1;
   double pheromone_evaporation = 0.5;
@@ -65,10 +68,11 @@ struct config : actor_system_config {
 
 void caf_main(actor_system& sys, const config& args) {
   scoped_actor self{sys};
-  auto mg = sys.spawn(actors::message_generator, args.seed, args.num_messages);
   auto bm = sys.spawn(benchmark::benchmarker, args.seed, args.num_nodes,
                       args.num_messages, args.message_log_path,
                       args.load_log_path);
+  auto mg = sys.spawn(actors::message_generator, bm, args.seed,
+                      args.num_messages, args.drop_timeout);
   auto tm
     = sys.spawn(actors::topology_manager, mg, bm,
                 routing::hyperparameters{args.pheromone_deposition,

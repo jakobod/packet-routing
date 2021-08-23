@@ -18,7 +18,6 @@
 namespace actors {
 
 struct message_generator_state {
-  static const char* name;
   std::vector<caf::actor> nodes;
   std::mt19937 gen;
   size_t num_messages = 0;
@@ -31,6 +30,7 @@ struct message_generator_state {
 
 caf::behavior
 message_generator(caf::stateful_actor<message_generator_state>* self,
-                  seed_type seed, size_t num_messages);
+                  caf::actor listener, seed_type seed, size_t num_messages,
+                  std::chrono::milliseconds drop_timeout);
 
 } // namespace actors

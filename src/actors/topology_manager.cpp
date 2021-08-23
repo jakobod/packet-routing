@@ -22,8 +22,6 @@ using namespace std::literals::chrono_literals;
 
 namespace actors {
 
-const char* topology_manager_state::name = "topology_manager";
-
 behavior topology_manager(stateful_actor<topology_manager_state>* self,
                           actor message_generator, actor listener,
                           routing::hyperparameters params, seed_type seed,

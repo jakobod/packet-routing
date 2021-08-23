@@ -19,8 +19,7 @@
 namespace actors {
 
 struct node_state {
-  static const char* name;
-  id_type node_id = -1;
+  id_type node_id = std::numeric_limits<id_type>::max();
   size_t message_count = 0;
   load_type current_load = 0;
   double load_weight = 0.0;

@@ -8,6 +8,7 @@
 
 #include <chrono>
 #include <ostream>
+#include <unordered_set>
 #include <vector>
 
 #include "types.hpp"
@@ -45,10 +46,19 @@ namespace std {
 template <>
 struct hash<::benchmark::result> {
   size_t operator()(const ::benchmark::result& r) const noexcept {
-    auto h1 = hash<size_t>{}(r.success);
+    auto h1 = hash<bool>{}(r.success);
     auto h2 = hash<size_t>{}(r.msg_id);
     return h1 ^ (h2 << 1);
   }
 };
 
 } // namespace std
+
+// -- Type aliases -------------------------------------------------------------
+
+namespace benchmark {
+
+using result_list = std::vector<result>;
+using result_set = std::unordered_set<result>;
+
+} // namespace benchmark

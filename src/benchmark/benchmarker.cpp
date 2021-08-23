@@ -29,30 +29,30 @@ behavior benchmarker(stateful_actor<benchmarker_state>* self,
   aout(self) << "[benchmarker] has id = " << self->id() << std::endl;
   self->set_default_handler(drop);
   self->state.loads.resize(num_nodes);
+  self->state.expected_messages = num_messages;
+  self->state.msg_log_path = message_log_path;
+  self->state.load_log_path = load_log_path;
+  auto print_progress = [=]() {
+    auto delivered_msgs = self->state.results.size();
+    if ((delivered_msgs % 100) == 0)
+      aout(self) << "[benchmarker] received " << delivered_msgs << std::endl;
+  };
   return {
-    [=](message_delivered_atom, routing::message& msg, bool success) {
-      auto now = steady_clock::now().time_since_epoch();
-      auto diff = now - msg.time_created();
-      auto duration = duration_cast<milliseconds>(diff);
-      self->state.results.emplace_back(msg.id(), msg.time_created(),
-                                       duration_cast<milliseconds>(now),
-                                       std::move(msg.path()), duration,
-                                       success);
-      if ((self->state.delivered_messages % 100) == 0)
-        aout(self) << "[benchmarker] received "
-                   << self->state.delivered_messages << std::endl;
-      if (++self->state.delivered_messages >= num_messages) {
-        std::sort(self->state.results.begin(), self->state.results.end(),
-                  [](const auto& a, const auto& b) {
-                    return a.msg_id < b.msg_id;
-                  });
-        self->state.save_messages(message_log_path);
-        self->state.save_load(load_log_path);
-        aout(self) << "Benchmark done.\nThe benchmark took: "
-                   << duration_cast<milliseconds>(
-                        self->state.results.back().time_received
-                        - self->state.results.front().time_created)
-                   << std::endl;
+    [=](message_delivered_atom, routing::message& msg) {
+      auto done = self->state.log_message(msg, true);
+      print_progress();
+      if (done) {
+        self->state.save_messages();
+        self->state.save_load();
+        self->quit();
+      }
+    },
+    [=](message_dropped_atom, routing::message& msg) {
+      auto done = self->state.log_message(msg, false);
+      print_progress();
+      if (done) {
+        self->state.save_messages();
+        self->state.save_load();
         self->quit();
       }
     },
