@@ -15,6 +15,7 @@
 #include <string_view>
 #include <vector>
 
+#include "benchmark/result.hpp"
 #include "caf/actor.hpp"
 #include "caf/behavior.hpp"
 #include "caf/stateful_actor.hpp"
@@ -22,34 +23,6 @@
 #include "types.hpp"
 
 namespace benchmark {
-
-struct result {
-  result(id_type id, std::chrono::milliseconds time_created,
-         std::chrono::milliseconds time_received, std::vector<id_type> path,
-         std::chrono::milliseconds duration, bool success)
-    : success_(success),
-      msg_id(id),
-      path(std::move(path)),
-      time_created_(time_created),
-      time_received_(time_received),
-      duration(duration) {
-    // nop
-  }
-
-  friend std::ostream& operator<<(std::ostream& os, const result& x) {
-    return os << x.msg_id << "," << x.time_created_.count() << ","
-              << x.time_received_.count() << "," << x.path.size() << ","
-              << x.duration.count() << "," << (x.success_ ? "True" : "False");
-  }
-
-  bool success_;
-  id_type msg_id;
-  std::vector<id_type> path;
-
-  std::chrono::milliseconds time_created_;
-  std::chrono::milliseconds time_received_;
-  std::chrono::milliseconds duration;
-};
 
 struct benchmarker_state {
   size_t delivered_messages = 0;

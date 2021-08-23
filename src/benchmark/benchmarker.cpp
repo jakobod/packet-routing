@@ -50,8 +50,8 @@ behavior benchmarker(stateful_actor<benchmarker_state>* self,
         self->state.save_load(load_log_path);
         aout(self) << "Benchmark done.\nThe benchmark took: "
                    << duration_cast<milliseconds>(
-                        self->state.results.back().time_received_
-                        - self->state.results.front().time_created_)
+                        self->state.results.back().time_received
+                        - self->state.results.front().time_created)
                    << std::endl;
         self->quit();
       }

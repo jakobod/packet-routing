@@ -41,6 +41,7 @@ set(
   src/actors/node.cpp
   src/actors/topology_manager.cpp
   src/actors/transition.cpp
+  src/benchmark/result.cpp
   src/graph/transition.cpp
   src/graph/undirected_graph.cpp
   src/routing/ant.cpp
