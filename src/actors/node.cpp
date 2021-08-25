@@ -32,7 +32,7 @@ behavior node(stateful_actor<node_state>* self, id_type node_id, seed_type seed,
     [=](register_transition_atom, actor trans, weight_type weight,
         id_type node_id) {
       self->state.transitions.emplace_back(trans, node_id);
-      self->state.routing_table->add_new_transition(node_id, weight);
+      // self->state.routing_table->add_new_transition(node_id, weight);
       return done_atom_v;
     },
     [=](message_atom, routing::message& msg) {

@@ -57,7 +57,6 @@ generate_random_undirected_graph(size_t num_nodes, size_t num_transitions,
       continue;
     transitions.emplace(std::move(new_transition));
   }
-  auto size_before = transitions.size();
   // Now fill up with dead transitions
   for (id_type node_1 = 0; node_1 < num_nodes; ++node_1) {
     for (id_type node_2 = 0; node_2 < num_nodes; ++node_2) {
