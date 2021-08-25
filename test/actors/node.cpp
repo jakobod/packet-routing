@@ -29,7 +29,7 @@ CAF_TEST(remove transition kill of other node) {
   CAF_CHECK(node_1_ptr);
   auto node_2 = sys.spawn(actors::node, 2, 1, self, self, params, true);
   auto trans = sys.spawn(actors::transition, std::make_pair(node_1, 1),
-                         std::make_pair(node_2, 2), self, 1, self);
+                         std::make_pair(node_2, 2), self, 1, self, true);
   run();
   expect((done_atom), from(trans).to(self).with(_));
   CAF_CHECK_EQUAL(node_1_ptr->state.transitions.size(), size_t{1});
@@ -51,7 +51,7 @@ CAF_TEST(remove transition on kill of transition) {
   auto node_2_ptr = actor_cast<stateful_actor<actors::node_state>*>(node_1);
   CAF_CHECK(node_2_ptr);
   auto trans = sys.spawn(actors::transition, std::make_pair(node_1, 1),
-                         std::make_pair(node_2, 2), self, 1, self);
+                         std::make_pair(node_2, 2), self, 1, self, true);
   run();
   expect((done_atom), from(trans).to(self).with(_));
   CAF_CHECK_EQUAL(node_1_ptr->state.transitions.size(), size_t{1});

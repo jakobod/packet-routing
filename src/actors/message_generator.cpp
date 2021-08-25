@@ -32,8 +32,8 @@ behavior message_generator(stateful_actor<message_generator_state>* self,
           ;
         routing::message msg(self->state.num_messages, source, destination);
         self->send(state.nodes.at(source), message_atom_v, msg);
-        self->delayed_send(listener, drop_timeout, message_dropped_atom_v,
-                           std::move(msg));
+        // self->delayed_send(listener, drop_timeout, message_dropped_atom_v,
+        //                    std::move(msg));
       }
       if (++self->state.num_messages < num_messages)
         self->delayed_send(self, 100ns, generate_message_atom_v);

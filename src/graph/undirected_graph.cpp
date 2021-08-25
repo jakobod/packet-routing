@@ -50,11 +50,20 @@ generate_random_undirected_graph(size_t num_nodes, size_t num_transitions,
   std::uniform_int_distribution<id_type> dist(0, num_nodes - 1);
   std::uniform_int_distribution<weight_type> edge_dist(1, 100);
   transition_set transitions;
+  // Add all transitions that should be alive
   while (transitions.size() < num_transitions) {
-    transition new_transition{dist(gen), dist(gen), edge_dist(gen)};
+    transition new_transition{dist(gen), dist(gen), edge_dist(gen), true};
     if (new_transition.node_1 == new_transition.node_2)
       continue;
     transitions.emplace(std::move(new_transition));
+  }
+  // Now fill up with dead transitions
+  for (id_type node_1; node_1 < num_nodes; ++node_1) {
+    for (id_type node_2; node_2 < num_nodes; ++node_2) {
+      if (node_1 == node_2)
+        continue;
+      transitions.emplace(node_1, node_2, edge_dist(gen), false);
+    }
   }
   return undirected_graph{std::move(nodes), transition_list{transitions.begin(),
                                                             transitions.end()}};

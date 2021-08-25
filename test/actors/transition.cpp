@@ -29,7 +29,7 @@ struct fixture : test_coordinator_fixture<> {
       trans{sys.spawn(actors::transition,
                       std::make_pair(actor_cast<actor>(node_1), node_1_id),
                       std::make_pair(actor_cast<actor>(node_2), node_2_id),
-                      parent, trans_weight, listener)} {
+                      parent, trans_weight, listener, true)} {
     // nop
   }
 
@@ -85,7 +85,7 @@ CAF_TEST(quit on down_msg) {
   auto node_1 = sys.spawn(actors::node, 1, 1, self, self, params, true);
   auto node_2 = sys.spawn(actors::node, 2, 1, self, self, params, true);
   auto trans = sys.spawn(actors::transition, std::make_pair(node_1, 1),
-                         std::make_pair(node_2, 2), self, 1, self);
+                         std::make_pair(node_2, 2), self, 1, self, true);
   self->monitor(trans);
   run();
   expect((done_atom), from(trans).to(self).with(_));

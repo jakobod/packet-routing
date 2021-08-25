@@ -8,8 +8,9 @@
 
 namespace graph {
 
-transition::transition(id_type node_1, id_type node_2, weight_type weight)
-  : node_1(node_1), node_2(node_2), weight(weight) {
+transition::transition(id_type node_1, id_type node_2, weight_type weight,
+                       bool alive)
+  : node_1(node_1), node_2(node_2), weight(weight), alive(alive) {
   // nop
 }
 
