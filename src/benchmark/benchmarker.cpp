@@ -40,6 +40,7 @@ behavior benchmarker(stateful_actor<benchmarker_state>* self,
     if (done) {
       self->state.save_messages();
       self->state.save_load();
+      aout(self) << "[benchmarker] benchmark done. QUITTING!" << std::endl;
       self->quit();
     }
   };

@@ -13,13 +13,13 @@
 namespace actors {
 
 struct transition_state {
-  static const char* name;
   weight_type weight = 0;
   size_t received_dones = 0;
 };
 
 caf::behavior transition(caf::stateful_actor<transition_state>* self,
                          node_pair node_1, node_pair node_2, caf::actor parent,
-                         weight_type weight, caf::actor listener, bool alive);
+                         weight_type weight, caf::actor benchmarker,
+                         bool alive);
 
 } // namespace actors

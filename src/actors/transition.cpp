@@ -11,19 +11,16 @@ using namespace caf;
 
 namespace actors {
 
-const char* transition_state::name = "transition";
-
 behavior killed_transition(caf::stateful_actor<transition_state>* self,
-                           caf::actor listener) {
-  self->set_default_handler(drop);
+                           caf::actor benchmarker) {
   aout(self) << "[transition] killed" << std::endl;
   return {
     [=](message_atom, routing::message& msg) {
       aout(self) << "[transition] dropped message" << std::endl;
-      self->send(listener, message_dropped_atom_v, msg);
+      self->send(benchmarker, message_dropped_atom_v, msg);
     },
     [=](resurrect_atom) {
-      aout(self) << "[transition] resurrecting" << std::endl;
+      aout(self) << "[transition] resurrected" << std::endl;
       self->unbecome();
     },
   };
@@ -31,18 +28,15 @@ behavior killed_transition(caf::stateful_actor<transition_state>* self,
 
 behavior transition(caf::stateful_actor<transition_state>* self,
                     node_pair node_1, node_pair node_2, caf::actor parent,
-                    weight_type weight, caf::actor listener, bool alive) {
-  self->set_down_handler([=](const down_msg&) { self->quit(); });
-  self->monitor(parent);
-  self->monitor(node_1.first);
-  self->monitor(node_2.first);
+                    weight_type weight, caf::actor benchmarker, bool alive) {
+  self->link_to(benchmarker);
   self->send(node_1.first, register_transition_atom_v, self, weight,
              node_2.second);
   self->send(node_2.first, register_transition_atom_v, self, weight,
              node_1.second);
   self->state.weight = weight;
   if (!alive)
-    self->become(killed_transition(self, listener));
+    self->become(killed_transition(self, benchmarker));
   return {
     [=](message_atom, routing::message& msg) {
       msg.update_weight(self->state.weight);
@@ -55,7 +49,7 @@ behavior transition(caf::stateful_actor<transition_state>* self,
                            std::chrono::milliseconds(self->state.weight),
                            message_atom_v, std::move(msg));
     },
-    [=](kill_atom) { self->become(killed_transition(self, listener)); },
+    [=](kill_atom) { self->become(killed_transition(self, benchmarker)); },
     [=](resurrect_atom) {
       // nop
     },

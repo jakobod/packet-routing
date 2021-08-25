@@ -58,8 +58,8 @@ generate_random_undirected_graph(size_t num_nodes, size_t num_transitions,
     transitions.emplace(std::move(new_transition));
   }
   // Now fill up with dead transitions
-  for (id_type node_1; node_1 < num_nodes; ++node_1) {
-    for (id_type node_2; node_2 < num_nodes; ++node_2) {
+  for (id_type node_1 = 0; node_1 < num_nodes; ++node_1) {
+    for (id_type node_2 = 0; node_2 < num_nodes; ++node_2) {
       if (node_1 == node_2)
         continue;
       transitions.emplace(node_1, node_2, edge_dist(gen), false);

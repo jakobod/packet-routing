@@ -26,24 +26,13 @@ struct topology_manager_state {
   size_t num_transitions = 0;
   size_t next_node_id = 0;
   std::vector<node_pair> nodes;
-  std::vector<caf::actor> transitions;
+  std::vector<caf::actor> living_transitions;
+  std::vector<caf::actor> dead_transitions;
   size_t initialized_transitions = 0;
   std::mt19937 gen;
 
   bool is_initialized() {
     return ++initialized_transitions == num_transitions;
-  }
-
-  void remove(size_t index) {
-    nodes.erase(nodes.begin() + index);
-  }
-
-  void remove(const caf::actor_addr& addr) {
-    nodes.erase(std::remove_if(nodes.begin(), nodes.end(),
-                               [=](const auto& p) { return p.first == addr; }),
-                nodes.end());
-    transitions.erase(std::remove(transitions.begin(), transitions.end(), addr),
-                      transitions.end());
   }
 };
 

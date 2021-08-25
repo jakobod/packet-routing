@@ -14,12 +14,10 @@ namespace actors {
 using namespace std::literals::chrono_literals;
 
 behavior message_generator(stateful_actor<message_generator_state>* self,
-                           caf::actor listener, seed_type seed,
+                           caf::actor benchmarker, seed_type seed,
                            size_t num_messages,
                            std::chrono::milliseconds drop_timeout) {
-  self->set_down_handler(
-    [=](const down_msg& msg) { self->state.remove_node(msg.source); });
-  self->link_to(listener);
+  self->link_to(benchmarker);
   self->state.gen.seed(seed);
   return {
     [=](generate_message_atom) {
@@ -40,7 +38,6 @@ behavior message_generator(stateful_actor<message_generator_state>* self,
     },
     [=](remove_node_atom, const actor& node) { self->state.remove_node(node); },
     [=](add_node_atom, const actor& node) {
-      self->monitor(node);
       self->state.nodes.push_back(node);
     },
   };
