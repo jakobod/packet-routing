@@ -25,7 +25,7 @@ result::result(id_type id, std::chrono::milliseconds time_created,
 }
 
 bool result::operator==(const result& other) const {
-  return (this->success == other.success) && (this->msg_id == other.msg_id)
+  return (this->msg_id == other.msg_id)
          && (this->time_created == other.time_created);
 }
 

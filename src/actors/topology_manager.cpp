@@ -26,12 +26,9 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
                           actor message_generator, actor benchmarker,
                           routing::hyperparameters params, seed_type seed,
                           bool random, std::chrono::milliseconds change_rate) {
-  self->set_exit_handler([=](const exit_msg&) {
-    aout(self) << "[topology_manager] benchmarker quit -> quitting!"
-               << std::endl;
-    self->quit();
-  });
-  self->link_to(benchmarker);
+  aout(self) << "[topo] has id = " << self->id() << std::endl;
+  self->set_down_handler([=](const down_msg&) { self->quit(); });
+  self->monitor(benchmarker);
   self->state.gen.seed(seed);
   return {
     [=](generate_atom, size_t num_nodes, size_t num_transitions) {
@@ -41,8 +38,11 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
       if (res == std::nullopt)
         std::abort();
       auto graph = *res;
-      aout(self) << "[topo] Generated graph" << std::endl;
-      aout(self) << "[topo] Spawning " << num_nodes << " nodes" << std::endl;
+      aout(self) << "[topo] Generated graph with " << graph.num_nodes()
+                 << " nodes and " << graph.num_transitions() << " transitions"
+                 << std::endl;
+      aout(self) << "[topo] Spawning " << graph.num_nodes() << " nodes"
+                 << std::endl;
       self->state.next_node_id = graph.nodes().back() + 1;
       for (const auto& node_id : graph.nodes()) {
         auto node = self->spawn(actors::node, node_id, seed, benchmarker, self,
@@ -72,8 +72,7 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
       auto& dead_transitions = self->state.dead_transitions;
       std::bernoulli_distribution d(0.5);
       auto kill = d(self->state.gen);
-      if (kill) {
-        aout(self) << "[topo] killing transition" << std::endl;
+      if (kill && !living_transitions.empty()) {
         std::uniform_int_distribution<size_t> dist(0, living_transitions.size()
                                                         - 1);
         auto index = dist(self->state.gen);
@@ -81,8 +80,7 @@ behavior topology_manager(stateful_actor<topology_manager_state>* self,
         self->send(trans, kill_atom_v);
         dead_transitions.emplace_back(std::move(trans));
         living_transitions.erase(living_transitions.begin() + index);
-      } else {
-        aout(self) << "[topo] resurrecting transition" << std::endl;
+      } else if (!dead_transitions.empty()) {
         std::uniform_int_distribution<size_t> dist(0,
                                                    dead_transitions.size() - 1);
         auto index = dist(self->state.gen);

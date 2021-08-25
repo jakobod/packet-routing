@@ -46,9 +46,7 @@ namespace std {
 template <>
 struct hash<::benchmark::result> {
   size_t operator()(const ::benchmark::result& r) const noexcept {
-    auto h1 = hash<bool>{}(r.success);
-    auto h2 = hash<size_t>{}(r.msg_id);
-    return h1 ^ (h2 << 1);
+    return hash<size_t>{}(r.msg_id);
   }
 };
 

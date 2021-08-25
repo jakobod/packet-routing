@@ -17,9 +17,10 @@ using namespace std::chrono_literals;
 namespace actors {
 
 behavior node(stateful_actor<node_state>* self, id_type node_id, seed_type seed,
-              actor listener, actor parent, routing::hyperparameters params,
+              actor benchmarker, actor, routing::hyperparameters params,
               bool random) {
-  self->link_to(parent);
+  self->set_down_handler([=](const down_msg&) { self->quit(); });
+  self->monitor(benchmarker);
   self->state.generator.seed(seed);
   self->state.node_id = node_id;
   self->state.load_weight = params.load_weight;
@@ -39,7 +40,7 @@ behavior node(stateful_actor<node_state>* self, id_type node_id, seed_type seed,
       ++self->state.message_count;
       if (msg.destination() == self->state.node_id) {
         // Message was delivered correctly
-        self->send(listener, message_delivered_atom_v, std::move(msg));
+        self->send(benchmarker, message_delivered_atom_v, std::move(msg));
       } else {
         msg.update_path(self->state.node_id);
         auto index = self->state.routing_table->get_route(msg.destination());
@@ -59,7 +60,7 @@ behavior node(stateful_actor<node_state>* self, id_type node_id, seed_type seed,
             }
           }
           if (!sent_message)
-            self->send(listener, message_dropped_atom_v, std::move(msg));
+            self->send(benchmarker, message_dropped_atom_v, std::move(msg));
         } else {
           auto trans = self->state.from_id(index);
           self->delayed_send(
@@ -71,7 +72,7 @@ behavior node(stateful_actor<node_state>* self, id_type node_id, seed_type seed,
     [=](get_load_atom) {
       self->state.current_load = static_cast<load_type>(
         self->state.load_weight * self->state.message_count);
-      self->send(listener, share_load_atom_v, self->state.current_load,
+      self->send(benchmarker, share_load_atom_v, self->state.current_load,
                  self->state.node_id);
       self->state.message_count = 0;
       self->delayed_send(self, 100ms, get_load_atom_v);

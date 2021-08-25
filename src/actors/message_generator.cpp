@@ -17,7 +17,9 @@ behavior message_generator(stateful_actor<message_generator_state>* self,
                            caf::actor benchmarker, seed_type seed,
                            size_t num_messages,
                            std::chrono::milliseconds drop_timeout) {
-  self->link_to(benchmarker);
+  aout(self) << "[message_generator] has id = " << self->id() << std::endl;
+  self->set_down_handler([=](const down_msg&) { self->quit(); });
+  self->monitor(benchmarker);
   self->state.gen.seed(seed);
   return {
     [=](generate_message_atom) {
@@ -30,8 +32,8 @@ behavior message_generator(stateful_actor<message_generator_state>* self,
           ;
         routing::message msg(self->state.num_messages, source, destination);
         self->send(state.nodes.at(source), message_atom_v, msg);
-        // self->delayed_send(listener, drop_timeout, message_dropped_atom_v,
-        //                    std::move(msg));
+        self->delayed_send(benchmarker, drop_timeout, message_dropped_atom_v,
+                           std::move(msg));
       }
       if (++self->state.num_messages < num_messages)
         self->delayed_send(self, 100ns, generate_message_atom_v);

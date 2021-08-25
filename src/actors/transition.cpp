@@ -13,14 +13,14 @@ namespace actors {
 
 behavior killed_transition(caf::stateful_actor<transition_state>* self,
                            caf::actor benchmarker) {
-  aout(self) << "[transition] killed" << std::endl;
+  // aout(self) << "[transition] killed" << std::endl;
   return {
     [=](message_atom, routing::message& msg) {
-      aout(self) << "[transition] dropped message" << std::endl;
+      // aout(self) << "[transition] dropped message" << std::endl;
       self->send(benchmarker, message_dropped_atom_v, msg);
     },
     [=](resurrect_atom) {
-      aout(self) << "[transition] resurrected" << std::endl;
+      // aout(self) << "[transition] resurrected" << std::endl;
       self->unbecome();
     },
   };
@@ -29,7 +29,8 @@ behavior killed_transition(caf::stateful_actor<transition_state>* self,
 behavior transition(caf::stateful_actor<transition_state>* self,
                     node_pair node_1, node_pair node_2, caf::actor parent,
                     weight_type weight, caf::actor benchmarker, bool alive) {
-  self->link_to(benchmarker);
+  self->set_down_handler([=](const down_msg&) { self->quit(); });
+  self->monitor(benchmarker);
   self->send(node_1.first, register_transition_atom_v, self, weight,
              node_2.second);
   self->send(node_2.first, register_transition_atom_v, self, weight,

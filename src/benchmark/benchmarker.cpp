@@ -26,6 +26,7 @@ behavior benchmarker(stateful_actor<benchmarker_state>* self,
                      [[maybe_unused]] seed_type seed, size_t num_nodes,
                      size_t num_messages, std::string message_log_path,
                      std::string load_log_path) {
+  aout(self) << "[benchmarker] has id = " << self->id() << std::endl;
   self->set_default_handler(drop);
   self->state.loads.resize(num_nodes);
   self->state.expected_messages = num_messages;
