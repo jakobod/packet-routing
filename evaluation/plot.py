@@ -50,7 +50,7 @@ def movingaverage(interval, window_size):
 
 def save_or_show(output):
   if output:
-    plt.savefig(f'{output}.png', bbox_inches='tight', transparent=False)
+    plt.savefig(f'{output}', bbox_inches='tight', transparent=False)
   else:
     plt.show()
 
@@ -58,8 +58,7 @@ def save_or_show(output):
 # -- plot functions ------------------------------------------------------------
 
 
-def plot_single(input, output, title):
-  print(f'plotting {input}')
+def plot_single(input, output):
   df = pd.read_csv(input)
   df['mean'] = df.mean(axis=1)
   df.reset_index().plot.scatter(x='index', y='mean', zorder=1, s=5,
@@ -68,8 +67,6 @@ def plot_single(input, output, title):
   plt.plot(y_av, color='r', linestyle='-', zorder=2, label='moving average')
   ax = plt.gca()
   ax.legend()
-  if title:
-    plt.title(title)
   plt.xlabel('Message number [#]')
   plt.ylabel('Duration [ms]')
   save_or_show(output)
@@ -79,7 +76,6 @@ def plot_single(input, output, title):
 
 def plot_multiple(inputs, output_dir):
   plots = []
-  print('plotting multiple')
   if output_dir:
     output_dir = os.path.normpath(output_dir)
   for input in inputs:
@@ -88,11 +84,25 @@ def plot_multiple(inputs, output_dir):
       output_path = f'{output_dir}/{os.path.splitext(filename)[0]}'
     else:
       output_path = None
-    mean, median = plot_single(input, output_path, None)
+    mean, median = plot_single(input, output_path)
     plots.append((mean, median, input))
   with open(f'{output_dir}/ranking.txt', "w") as f:
     for p in sorted(plots, key=lambda tup: tup[0]):
       f.write(str(p) + '\n')
+
+
+def plot_all_in_one(inputs, output):
+  _, ax = plt.subplots()
+  for input in inputs:
+    df = pd.read_csv(input)
+    df['mean'] = df.mean(axis=1)
+    y_av, _, _ = movingaverage(df['mean'], 250)
+    ax.plot(y_av, linestyle='-', label=os.path.basename(input))
+
+  ax.legend()
+  plt.xlabel('Message [#]')
+  plt.ylabel('Duration [ms]')
+  save_or_show(output)
 
 
 def main():
@@ -101,8 +111,9 @@ def main():
                       nargs='+', default=[], metavar='INPUT')
   parser.add_argument(
       '--output', '-o', help='The output path', metavar='OUTPUT')
-  parser.add_argument(
-      '--title', '-t', help='The title of the plot', metavar='TITLE')
+  parser.add_argument('--all-in-one', '-a',
+                      help='Combine all to single plot',
+                      action='store_true')
   parser.add_argument('--remove-dropped', '-r',
                       help='Remove the dropped packets values',
                       action='store_true')
@@ -116,9 +127,11 @@ def main():
   elif args.concatenate:
     concatenate(args.input[0], args.remove_dropped, args.output)
   elif len(args.input) == 1:
-    plot_single(args.input[0], args.output, args.title)
+    plot_single(args.input[0], args.output)
   else:
-    if args.output:
+    if args.all_in_one:
+      plot_all_in_one(args.input, args.output)
+    elif args.output:
       plot_multiple(args.input, args.output)
     else:
       print('Output HAS to be specified for multiple inputs')
