@@ -32,6 +32,8 @@ void entry::update(weight_type weight) {
 
 void entry::decay() {
   pheromones = (1 - pheromone_evaporation) * pheromones;
+  if (pheromones == 0)
+    pheromones = 1;
 }
 
 bool entry::operator==(const entry& other) const {
