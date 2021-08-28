@@ -20,10 +20,11 @@ import numpy as np
 # Print some kind of scale + file names for easier evaluation afterward
 
 
-plt.rc('figure', figsize=(16, 9))
-
+plt.rc('figure', figsize=(5.5, 4))
+plt.rc('font', size=13)
 
 # -- helper functions ----------------------------------------------------------
+
 
 def concatenate(inputs, remove_dropped, column, output):
   print(f'concatenate {inputs}')
@@ -62,49 +63,52 @@ def save_or_show(output):
     plt.show()
 
 
-# -- plot functions ------------------------------------------------------------
+def to_label(filename, dep):
+  filename = os.path.basename(filename)
+  filename, _ = os.path.splitext(filename)
+  parts = filename.split('_')
+  if(filename.startswith('random')):
+    return 'rand'
+  elif dep:
+    return f'{parts[3]}'
+  else:
+    return f'{parts[2]}'
 
 
-def plot_single(input, output):
-  df = pd.read_csv(input)
-  df['mean'] = df.mean(axis=1)
-  df.reset_index().plot.scatter(x='index', y='mean', zorder=1, s=5,
-                                alpha=0.1)
-  y_av, mean, median = movingaverage(df['mean'], 250)
-  plt.plot(y_av, color='r', linestyle='-', zorder=2, label='moving average')
-  ax = plt.gca()
-  ax.legend()
-  plt.xlabel('Message number [#]')
-  plt.ylabel('Duration [ms]')
-  save_or_show(output)
-  plt.close('all')
-  return mean, median
+def x_formatter(x, pos):
+  if x >= 1000:
+    return '{:>}K'.format(int(x / 1000))
+  return '{:>}'.format(int(x))
 
 
-def plot(inputs, output, title, xlabel, ylabel, window=250):
+# -- Plot functions ------------------------------------------------------------
+
+
+def plot(inputs, output, title, xlabel, ylabel, dep, window=250):
   _, ax = plt.subplots()
   for input in inputs:
     df = pd.read_csv(input)
     df['mean'] = df.mean(axis=1)
     y_av, _, _ = movingaverage(df['mean'], window)
-    ax.plot(y_av, linestyle='-', label=os.path.basename(input))
-  ax.legend()
-  plt.title(title)
+    ax.plot(y_av[125:-125], linestyle='-', label=to_label(input, dep))
+  ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+  # plt.title(title)
+  ax.xaxis.set_major_formatter(plt.FuncFormatter(x_formatter))
   plt.xlabel(xlabel)
   plt.ylabel(ylabel)
   save_or_show(output)
 
 
-def plot_duration(inputs, output):
-  plot(inputs, output, 'Duration', 'Message [#]', 'Duration [ms]')
+def plot_duration(inputs, output, dep):
+  plot(inputs, output, 'Duration', 'Message [#]', 'Duration [ms]', dep)
 
 
-def plot_success(inputs, output):
-  plot(inputs, output, 'Success', 'Message [#]', 'Succes [%]')
+def plot_success(inputs, output, dep):
+  plot(inputs, output, 'Success', 'Message [#]', 'Succes [%]', dep)
 
 
-def plot_path_length(inputs, output):
-  plot(inputs, output, 'Path lengths', 'Message [#]', 'Path length [#]')
+def plot_path_length(inputs, output, dep):
+  plot(inputs, output, 'Path lengths', 'Message [#]', 'Path length [#]', dep)
 
 
 def main():
@@ -116,6 +120,9 @@ def main():
   parser.add_argument('--concatenate', '-c',
                       help='Concatenate multiple runs and ')
   parser.add_argument('--duration', '-d',
+                      help='Combine all to single plot',
+                      action='store_true')
+  parser.add_argument('--deposition-const',
                       help='Combine all to single plot',
                       action='store_true')
   parser.add_argument('--path-length', '-p',
@@ -131,20 +138,17 @@ def main():
   args = parser.parse_args()
   if not args.input:
     print('Please specify an input to read')
+  if args.duration:
+    plot_duration(args.input, args.output, args.deposition_const)
+  elif args.path_length:
+    plot_path_length(args.input, args.output, args.deposition_const)
+  elif args.success:
+    plot_success(args.input, args.output, args.deposition_const)
   elif args.concatenate:
     concatenate(args.input, args.remove_dropped,
                 args.concatenate, args.output)
-  elif len(args.input) == 1:
-    plot_single(args.input[0], args.output)
   else:
-    if args.duration:
-      plot_duration(args.input, args.output)
-    elif args.path_length:
-      plot_path_length(args.input, args.output)
-    elif args.success:
-      plot_success(args.input, args.output)
-    else:
-      print('Output HAS to be specified for multiple inputs')
+    print('Output HAS to be specified for multiple inputs')
 
 
 if __name__ == '__main__':
