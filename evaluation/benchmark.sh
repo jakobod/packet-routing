@@ -16,8 +16,6 @@ num_packets=250000
 seed=12345
 timeout=30s
 
-counter=0
-
 function run_ant_benchmark() {
   change=$1
   for d in $(seq 1 2 10); do
@@ -85,5 +83,3 @@ for change in 0ms 100ms 1000ms; do
   run_ant_benchmark ${change}
   random_benchmark ${change}
 done;
-
-echo "Will be ${counter} runs."

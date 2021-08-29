@@ -91,7 +91,10 @@ def plot(inputs, output, title, xlabel, ylabel, dep, window=250):
     df['mean'] = df.mean(axis=1)
     y_av, _, _ = movingaverage(df['mean'], window)
     ax.plot(y_av[125:-125], linestyle='-', label=to_label(input, dep))
-  ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+  if dep:
+    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), title='Evaporation')
+  else:
+    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), title='Deposition')
   # plt.title(title)
   ax.xaxis.set_major_formatter(plt.FuncFormatter(x_formatter))
   plt.xlabel(xlabel)
